@@ -13,13 +13,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.superkat.ziptoit.ZipHelper;
 import net.superkat.ziptoit.ZipToIt;
-import net.superkat.ziptoit.item.StickyHandComponent;
-import org.jetbrains.annotations.Nullable;
+import net.superkat.ziptoit.zipcast.ZipcastManager;
 import org.joml.Matrix4f;
 
 public class RaycastRenderer {
@@ -28,11 +25,11 @@ public class RaycastRenderer {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerEntity player = client.player;
         if(player == null) return;
-        if(!ZipHelper.playerIsAimingZipcaster(player)) return;
+        if(!ZipcastManager.playerIsAimingZipcaster(player)) return;
 
         float tickProgress = context.tickCounter().getTickProgress(true);
         ItemStack stickyHand = player.getActiveItem();
-        BlockHitResult raycast = raycastStickyHand(player, stickyHand, tickProgress);
+        BlockHitResult raycast = ZipcastManager.raycastStickyHand(player, stickyHand, tickProgress);
         if(raycast == null) return;
 
         renderRaycast(context, raycast, stickyHand, tickProgress);
@@ -52,7 +49,7 @@ public class RaycastRenderer {
         boolean firstPerson = client.options.getPerspective().isFirstPerson() && player == MinecraftClient.getInstance().player;
         float offsetAmount = firstPerson ? 1 : 0.05f;
         float xOffset = getArmHoldingStickyHand(player) == Arm.RIGHT ? offsetAmount : -offsetAmount;
-        renderSimpleLine(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_LINE), context.camera(), playerPos.add(0, 0.5, 0), raycastPos, 0.1f, xOffset, 1f, 0f, 0f, 1f);
+        renderSimpleLine(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_LINE), playerPos.add(0, 0.5, 0), raycastPos, 0.1f, xOffset, 1f, 0f, 0f, 1f);
         matrices.pop();
 
         matrices.push();
@@ -61,36 +58,10 @@ public class RaycastRenderer {
         matrices.pop();
     }
 
-    @Nullable
-    public static BlockHitResult raycastStickyHand(ClientPlayerEntity player, ItemStack stickyHand, float tickProgress) {
-        StickyHandComponent component = stickyHand.get(ZipToIt.STICKY_HAND_COMPONENT_TYPE);
-
-        int zipRange = 48;
-        if(component != null) zipRange = component.zipRange();
-
-        HitResult raycast = player.raycast(zipRange, tickProgress, false);
-        if(raycast.getType() == HitResult.Type.BLOCK) {
-            return (BlockHitResult) raycast;
-        }
-        return null;
-    }
-
-    public static void renderSimpleLine(MatrixStack matrixStack, VertexConsumer consumer, Camera camera, Vec3d origin, Vec3d target, float width, float xOffsetAmount, float red, float green, float blue, float alpha) {
+    public static void renderSimpleLine(MatrixStack matrixStack, VertexConsumer consumer, Vec3d origin, Vec3d target, float width, float xOffsetAmount, float red, float green, float blue, float alpha) {
         int light = LightmapTextureManager.pack(15, 15);
         renderLineSegment(matrixStack, consumer, origin, target, red, green, blue, alpha, light, width, 0);
         renderLineSegment(matrixStack, consumer, target, origin, red, green, blue, alpha, light, width, xOffsetAmount);
-
-        // Basically just rendering a long quad here - its small enough where you can't really notice that
-//        matrixStack.push();
-//        Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
-//        float halfWidth = width / 2f;
-//        int light = LightmapTextureManager.pack(15, 15);
-//
-//        consumer.vertex(matrix4f, (float) (origin.getX() - halfWidth), (float) (origin.getY() - halfWidth), (float) (origin.getZ() - halfWidth)).color(red, green, blue, alpha).light(light);
-//        consumer.vertex(matrix4f, (float) (target.getX() - halfWidth), (float) (target.getY() - halfWidth), (float) (target.getZ() + halfWidth)).color(red, green, blue, alpha).light(light);
-//        consumer.vertex(matrix4f, (float) (origin.getX() + halfWidth), (float) (origin.getY() - halfWidth), (float) (origin.getZ() - halfWidth)).color(red, green, blue, alpha).light(light);
-//        consumer.vertex(matrix4f, (float) (target.getX() + halfWidth), (float) (target.getY() - halfWidth), (float) (target.getZ() + halfWidth)).color(red, green, blue, alpha).light(light);
-//        matrixStack.pop();
     }
 
     // Target & origin may be swapped? Don't know don't care it just works now ¯\_(ツ)_/¯ (that's gonna hurt me later isn't it)
