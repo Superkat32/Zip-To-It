@@ -1,7 +1,6 @@
 package net.superkat.ziptoit;
 
 import net.fabricmc.api.ModInitializer;
-
 import net.fabricmc.fabric.api.item.v1.ComponentTooltipAppenderRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.component.ComponentType;
@@ -15,6 +14,8 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.superkat.ziptoit.item.StickyHandComponent;
 import net.superkat.ziptoit.item.StickyHandItem;
+import net.superkat.ziptoit.network.ZipToItPackets;
+import net.superkat.ziptoit.network.ZipToItServerNetworkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,9 @@ public class ZipToIt implements ModInitializer {
 			stickyHandStack.set(STICKY_HAND_COMPONENT_TYPE, new StickyHandComponent(64));
 			group.add(stickyHandStack);
 		});
+
+		ZipToItPackets.init();
+		ZipToItServerNetworkHandler.init();
 	}
 
 	private static Item registerItem(String id, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {

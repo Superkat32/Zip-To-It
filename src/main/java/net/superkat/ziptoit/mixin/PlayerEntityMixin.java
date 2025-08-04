@@ -1,9 +1,14 @@
 package net.superkat.ziptoit.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
+import net.superkat.ziptoit.zipcast.ZipcastTarget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,52 +20,75 @@ public class PlayerEntityMixin extends EntityMixin implements ZipcasterPlayer {
     @Unique
     public boolean zipcasting = false;
     @Unique
-    public Vec3d zipcastPos = null;
+    public boolean stickingToWall = false;
     @Unique
-    public float maxZipcastSpeed = 0f;
-    @Unique
-    public float speedIncreasePerTick = 0f;
+    public ZipcastTarget zipcastTarget;
     @Unique
     public float currentZipcastSpeed = 0f;
     @Unique
-    public boolean stickingToWall = false;
-    @Unique
     public int zipcastTicks = 0;
+    @Unique
+    public int wallTicks = 0;
+    @Unique
+    public Vec3d lastZipcastVelocity = Vec3d.ZERO;
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSpectator()Z"))
-//    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;hasVehicle()Z"))
-    public void ziptoit$disableCollisionWhileZipcasting(CallbackInfo ci) {
-        if(this.isZipcasting()) {
-            PlayerEntity self = (PlayerEntity) (Object) this;
-            if(ZipcastManager.shouldDisableCollisionForPlayer(self)) {
-                this.noClip = true;
-            }
+    public void ziptoit$tickZipcastPlayer(CallbackInfo ci) {
+        PlayerEntity self = (PlayerEntity) (Object) this;
+        ZipcastManager.tickZipcasterPlayer(self);
+    }
 
-            zipcastTicks++;
-            ZipcastManager.tickZipcastingPlayer(self);
-//            if(this.zipcastTicks() >= 60) {
-//                this.ziptoit$endZipcastEarly();
-//            }
+    @WrapOperation(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;travel(Lnet/minecraft/util/math/Vec3d;)V"))
+    public void ziptoit$modifyMovementWhileZipcastingAndStickingToWall(PlayerEntity instance, Vec3d movementInput, Operation<Void> original) {
+        boolean ignoreZipcastControls = ZipcastManager.playerShouldIgnoreZipcastControls(instance);
+        if(ignoreZipcastControls) {
+            // This mixin can get called in spots when I don't want it to,
+            // specifically when the player has a vehicle or is creative flying,
+            // so this allows those to remain normal while also providing a good spot for mod compatibility
+            original.call(instance, movementInput);
+            return;
+        }
+
+        if(this.isZipcasting()) {
+            ZipcastManager.travelZipcasting(instance, movementInput);
+        } else if(this.isStickingToWall()) {
+            ZipcastManager.travelStickingToWall(instance, movementInput);
+        } else {
+            original.call(instance, movementInput);
         }
     }
 
-    @Override
-    public void ziptoit$zipcastToPos(Vec3d pos, float speed, float speedIncreasePerTick) {
-        this.zipcastPos = pos;
-        this.maxZipcastSpeed = speed;
-        this.speedIncreasePerTick = speedIncreasePerTick;
-        this.zipcasting = true;
-        this.stickingToWall = false;
-        this.zipcastTicks = 0;
+    @ModifyReturnValue(method = "getExpectedPose", at = @At("RETURN"))
+    public EntityPose ziptoit$modifyPoseAndHitboxForZipcasting(EntityPose original) {
+        PlayerEntity self = (PlayerEntity) (Object) this;
+        if(this.isZipcasting()) {
+            if(ZipcastManager.activateSwimmingPoseForZipcaster(self)) {
+                return EntityPose.SWIMMING;
+            }
+        } else if (this.isStickingToWall()) {
+            return EntityPose.CROUCHING;
+        }
+        return original;
     }
 
     @Override
-    public void ziptoit$endZipcastEarly() {
-        this.zipcasting = false;
-        this.zipcastPos = null;
-        this.maxZipcastSpeed = 0;
-        this.speedIncreasePerTick = 0;
+    public void ziptoit$zipcastToPos(ZipcastTarget zipcastTarget) {
+        this.zipcastTarget = zipcastTarget;
+        this.zipcasting = true;
+        this.stickingToWall = false;
         this.zipcastTicks = 0;
+        this.wallTicks = 0;
+
+        ZipcastManager.endWallStick((PlayerEntity) (Object) this, false);
+    }
+
+    @Override
+    public void ziptoit$cancelZipcast() {
+        this.zipcastTarget = null;
+        this.zipcasting = false;
+        this.stickingToWall = false;
+        this.zipcastTicks = 0;
+        this.wallTicks = 0;
     }
 
     @Override
@@ -69,27 +97,57 @@ public class PlayerEntityMixin extends EntityMixin implements ZipcasterPlayer {
     }
 
     @Override
+    public void setIsZipcasting(boolean zipcasting) {
+        this.zipcasting = zipcasting;
+    }
+
+    @Override
     public boolean isStickingToWall() {
         return this.stickingToWall;
     }
 
     @Override
-    public Vec3d zipcastPos() {
-        return this.zipcastPos;
+    public void setIsStickingToWall(boolean isStickingToWall) {
+        this.stickingToWall = isStickingToWall;
     }
 
     @Override
-    public float maxZipcastSpeed() {
-        return this.maxZipcastSpeed;
+    public ZipcastTarget zipcastTarget() {
+        return this.zipcastTarget;
     }
 
     @Override
-    public float currentZipcastSpeed() {
-        return this.currentZipcastSpeed;
+    public void setZipcastTarget(ZipcastTarget zipcastTarget) {
+        this.zipcastTarget = zipcastTarget;
     }
 
     @Override
     public int zipcastTicks() {
         return this.zipcastTicks;
+    }
+
+    @Override
+    public void setZipcastTicks(int zipcastTicks) {
+        this.zipcastTicks = zipcastTicks;
+    }
+
+    @Override
+    public int wallTicks() {
+        return this.wallTicks;
+    }
+
+    @Override
+    public void setWallTicks(int wallTicks) {
+        this.wallTicks = wallTicks;
+    }
+
+    @Override
+    public Vec3d lastZipcastVelocity() {
+        return this.lastZipcastVelocity;
+    }
+
+    @Override
+    public void setLastZipcastVelocity(Vec3d velocity) {
+        this.lastZipcastVelocity = velocity;
     }
 }

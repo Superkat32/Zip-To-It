@@ -1,28 +1,53 @@
 package net.superkat.ziptoit.duck;
 
 import net.minecraft.util.math.Vec3d;
+import net.superkat.ziptoit.zipcast.ZipcastTarget;
 
 public interface ZipcasterPlayer {
 
-    void ziptoit$zipcastToPos(Vec3d pos, float speed, float speedIncreasePerTick);
+    void ziptoit$zipcastToPos(ZipcastTarget zipcastTarget);
 
-    void ziptoit$endZipcastEarly();
+    void ziptoit$cancelZipcast();
+
 
     boolean isZipcasting();
 
+    void setIsZipcasting(boolean zipcasting);
+
     boolean isStickingToWall();
 
-    Vec3d zipcastPos();
+    void setIsStickingToWall(boolean isStickingToWall);
 
-    float maxZipcastSpeed();
+    ZipcastTarget zipcastTarget();
 
-    float currentZipcastSpeed();
+    void setZipcastTarget(ZipcastTarget zipcastTarget);
+//
+//    Vec3d zipcastPos();
+//
+//    void setZipcastPos(Vec3d zipcastPos);
+//
+//    float maxZipcastSpeed();
+//
+//    float currentZipcastSpeed();
 
     int zipcastTicks();
 
-    default void ziptoit$zipcastToPos(Vec3d pos) {
-        this.ziptoit$zipcastToPos(pos, 1f, 0.05f);
+    void setZipcastTicks(int zipcastTicks);
+
+    default void increaseZipcastTicks() {
+        this.setZipcastTicks(this.zipcastTicks() + 1);
     }
 
+    int wallTicks();
+
+    void setWallTicks(int wallTicks);
+
+    default void increaseWallTicks() {
+        this.setWallTicks(this.wallTicks() + 1);
+    }
+
+    Vec3d lastZipcastVelocity();
+
+    void setLastZipcastVelocity(Vec3d velocity);
 
 }

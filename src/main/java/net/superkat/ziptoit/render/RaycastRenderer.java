@@ -87,6 +87,7 @@ public class RaycastRenderer {
 
         matrixStack.translate(xOffsetAmount, 0,0);
 
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((System.currentTimeMillis() % 5000) / 5000f * 360f));
         drawTriangle(matrixStack.peek().getPositionMatrix(), consumer, width, -length, red, green, blue, alpha, light);
 
         matrixStack.pop();
