@@ -36,7 +36,7 @@ public class ZipcastManager {
 
     }
 
-    public static void tickZipcasting(PlayerEntity player) {
+//    public static void tickZipcasting(PlayerEntity player) {
 //        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 //
 //        Vec3d zipcastPos = zipcasterPlayer.zipcastPos();
@@ -73,18 +73,18 @@ public class ZipcastManager {
 //
 //        player.setVelocity(velX, velY, velZ);
 //        player.velocityDirty = true;
-    }
+//    }
 
-    public static void tickStickingToWall(PlayerEntity player) {
-        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
-
-        player.setSneaking(true);
-        if(zipcasterPlayer.wallTicks() >= 80) {
-            zipcasterPlayer.setIsStickingToWall(false);
-            player.setSneaking(false);
-            player.setNoGravity(false);
-        }
-    }
+//    public static void tickStickingToWall(PlayerEntity player) {
+//        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+//
+//        player.setSneaking(true);
+//        if(zipcasterPlayer.wallTicks() >= 80) {
+//            zipcasterPlayer.setIsStickingToWall(false);
+//            player.setSneaking(false);
+//            player.setNoGravity(false);
+//        }
+//    }
 
     public static void travelZipcasting(PlayerEntity player, Vec3d movementInput) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
@@ -114,8 +114,6 @@ public class ZipcastManager {
         Vec3d normal = difference.normalize();
         Vec3d newVelocity = normal.multiply(maxSpeed);
 
-        Vec3d newPos = currentPos;
-
         if(zipcastTicks >= startingTicks) {
 //            if(player.horizontalCollision || player.verticalCollision) {
 //                end = true;
@@ -141,121 +139,11 @@ public class ZipcastManager {
                 end = true;
             }
 
-
-
-//            if(player.getWorld().canCollide(player, player.getBoundingBox().offset(newVelocity))) {
-//                newVelocity = Vec3d.ZERO;
-//                end = true;
-//            }
-//            BlockHitResult blockHitResult = player.getWorld()
-//                .getCollisionsIncludingWorldBorder(
-//                        new RaycastContext(player.getPos(), player.getPos().add(newVelocity), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player)
-//                );
-
-//            if(blockHitResult.getType() == HitResult.Type.BLOCK) {
-//                Vec3d signum = new Vec3d(Math.signum(newVelocity.x), Math.signum(newVelocity.y), Math.signum(newVelocity.z));
-//                Vec3d multiplied = signum.multiply(0.5f);
-//                Vec3d newPosReal = blockHitResult.getPos().subtract(multiplied);
-//                player.requestTeleport(blockHitResult.getPos().getX(), blockHitResult.getPos().getY(), blockHitResult.getPos().getZ());
-//                player.requestTeleport(newPosReal.getX(), newPosReal.getY(), newPosReal.getZ());
-
-//                Vec3d hit = blockHitResult.getPos();
-//                Vec3d realPos = hit.offset(blockHitResult.getSide(), 0.5f * player.getScale());
-//                player.requestTeleport(realPos.getX(), realPos.getY(), realPos.getZ());
-//                newVelocity = Vec3d.ZERO;
-//                end = true;
-//            }
-//            player.setPosition(new Vec3d(0, -56, 13));
         }
-
-
-
-
-//        if(zipcastTicks >= startingTicks) {
-//            BlockHitResult blockHitResult = player.getWorld()
-//                    .getCollisionsIncludingWorldBorder(
-//                            new RaycastContext(player.getPos(), player.getPos().add(player.getVelocity().x, player.getVelocity().y * 1.2, player.getVelocity().z), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player)
-//                    );
-//
-//            Vec3d raycastPos = blockHitResult.getPos();
-//            player.setPosition(raycastPos);
-//            player.tickBlockCollision(currentPos, raycastPos);
-//            if(blockHitResult.getType() != HitResult.Type.BLOCK) {
-//            }
-
-//            player.move(MovementType.SELF, player.getVelocity());
-//            if(blockHitResult.getType() != HitResult.Type.MISS) {
-//                player.velocityDirty = true;
-//                if(blockHitResult.getType() == HitResult.Type.BLOCK) {
-//                    Vec3d velo = player.getVelocity();
-//                    Vec3d signum = new Vec3d(Math.signum(velo.x), Math.signum(velo.y), Math.signum(velo.z));
-//                    Vec3d multiplied = signum.multiply(0.005f);
-//                    player.setPosition(player.getPos().subtract(multiplied));
-//                    player.tickBlockCollision(player.getPos(), player.getLastRenderPos());
-//                    player.setVelocity(Vec3d.ZERO);
-//                    player.move(MovementType.SELF, player.getVelocity());
-//                    end = true;
-//                }
-//            }
-
-//            if(player.getWorld().canCollide(player, player.getBoundingBox().offset(newVelocity))) {
-//                end = true;
-//            }
-//            System.out.println(test);
-
-//            BlockHitResult blockHitResult = player.getWorld()
-//                    .getCollisionsIncludingWorldBorder(
-//                            new RaycastContext(currentPos, currentPos.add(currentVelocity), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player)
-//                    );
-//
-//            if(blockHitResult != null && blockHitResult.getType() == HitResult.Type.BLOCK) {
-//                newPos = currentPos.add(newVelocity).offset(blockHitResult.getSide(), 0.5);
-//                end = true;
-//            }
-//        }
-
-//        float distance = (float) difference.horizontalLength();
-////        if(distance <= currentVelocity.horizontalLength() * maxSpeed * 0.2f) {
-////        float maxDistance = (float) (0.5f + 0.5f * currentVelocity.horizontalLength());
-////        float maxDistance = (float) Math.abs(2f - (currentVelocity.horizontalLength() * 0.75f));
-////        float maxDistance = (float) (0.5f + (maxSpeed >= 5f ? 0f : maxSpeed / 5f));
-//
-////        float velocityDifference = (float) currentVelocity.subtract(lastZipcastVelocity).normalize().length();
-//        float maxDistance = 0.5f;
-//        boolean end = distance <= maxDistance;
-//
-//        if(zipcastTicks >= startingTicks && currentVelocity.length() == 0.0) {
-//            player.refreshPositionAndAngles(zipcastPos.add(0, 0.5, 0), player.getYaw(), player.getPitch());
-//            end = true;
-//        }
-
-//        if(player.isLogicalSideForUpdatingMovement()) {
-//            player.setVelocity(newVelocity);
-//            player.velocityDirty = true;
-//            player.move(MovementType.SELF, player.getVelocity());
-//        }
 
         if(end) {
-//            player.setVelocity(newVelocity.multiply(0.1f));
-//            player.refreshPositionAndAngles(player.getPos().offset(zipcastTarget.raycastSide().getOpposite(), 2.9f), player.getYaw(), player.getPitch());
-//            player.refreshPositionAndAngles(new Vec3d(0.5, -55, 13.5), player.getYaw(), player.getPitch());
-//            player.refreshPositionAndAngles(new Vec3d(0.5, -55, 13.5), player.getYaw(), player.getPitch());
-//            player.velocityDirty = true;
-//            player.move(MovementType.SELF, player.getVelocity());
-//            currentVelocity = player.getVelocity();
-//            Vec3d whateverThisIs = new Vec3d(Math.signum(currentVelocity.x), Math.signum(currentVelocity.y), Math.signum(currentVelocity.z));
-//            Vec3d multiplied = whateverThisIs.multiply(0.05f);
-//            player.setPosition(zipcastPos.subtract(multiplied));
-//            player.setOnGround(true);
-
-//            player.move(MovementType.SELF, player.getVelocity());
-//            player.setVelocity(Vec3d.ZERO);
-//            player.velocityDirty = true;
             tryStickingToWall(player);
-//            return;
         }
-//        player.velocityDirty = true;
-//        player.move(MovementType.SELF, player.getVelocity());
     }
 
     public static void tryStickingToWall(PlayerEntity player) {
@@ -290,16 +178,6 @@ public class ZipcastManager {
             endWallStick(player, jumping);
         }
 
-//        if(player.isJumping()) {
-//            player.setVelocity(0, 0.8f, 0);
-//            end = true;
-//        }
-//
-//        if(end) {
-//            zipcasterPlayer.setIsStickingToWall(false);
-//            player.setSneaking(false);
-//            player.setNoGravity(false);
-//        }
         player.move(MovementType.SELF, player.getVelocity());
     }
 

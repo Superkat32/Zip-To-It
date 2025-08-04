@@ -58,7 +58,10 @@ public class RaycastRenderer {
         matrices.pop();
     }
 
+    // This is a slightly modified version of my line renderer for Jet Lag(an unreleased for now:tm: mod)
+    // https://github.com/Superkat32/Jet-Lag/blob/master/src/main/java/net/superkat/jetlag/rendering/ContrailRenderer.java#L232
     public static void renderSimpleLine(MatrixStack matrixStack, VertexConsumer consumer, Vec3d origin, Vec3d target, float width, float xOffsetAmount, float red, float green, float blue, float alpha) {
+        // Normally, there'd be more than 2 points in this list, but because there's only two, this was my best workaround
         int light = LightmapTextureManager.pack(15, 15);
         renderLineSegment(matrixStack, consumer, origin, target, red, green, blue, alpha, light, width, 0);
         renderLineSegment(matrixStack, consumer, target, origin, red, green, blue, alpha, light, width, xOffsetAmount);
@@ -87,6 +90,8 @@ public class RaycastRenderer {
 
         matrixStack.translate(xOffsetAmount, 0,0);
 
+        // FIXME - The current time thing was a test to see what this was doing, and it worked well ¯\_(ツ)_/¯
+        //  replace System.currentTimeMillis with actual, acceptable code... tomorrow
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((System.currentTimeMillis() % 5000) / 5000f * 360f));
         drawTriangle(matrixStack.peek().getPositionMatrix(), consumer, width, -length, red, green, blue, alpha, light);
 
