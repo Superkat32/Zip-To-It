@@ -43,7 +43,7 @@ public class ZipToIt implements ModInitializer {
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(group -> {
 			ItemStack stickyHandStack = new ItemStack(STICKY_HAND_ITEM);
-			stickyHandStack.set(STICKY_HAND_COMPONENT_TYPE, new StickyHandComponent(64));
+			stickyHandStack.set(STICKY_HAND_COMPONENT_TYPE, new StickyHandComponent(48));
 			group.add(stickyHandStack);
 		});
 

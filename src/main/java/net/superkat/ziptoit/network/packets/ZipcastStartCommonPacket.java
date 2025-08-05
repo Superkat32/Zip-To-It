@@ -13,15 +13,7 @@ public record ZipcastStartCommonPacket(ZipcastTarget zipcastTarget) implements C
     public static final PacketCodec<RegistryByteBuf, ZipcastStartCommonPacket> CODEC = PacketCodec.tuple(
             ZipcastTarget.PACKET_CODEC, ZipcastStartCommonPacket::zipcastTarget,
             ZipcastStartCommonPacket::new
-//            PacketCodecs.INTEGER, ZipcastStartCommonPacket::playerId,
-//            Vec3d.PACKET_CODEC, ZipcastStartCommonPacket::pos,
-//            Direction.PACKET_CODEC, ZipcastStartCommonPacket::raycastSide,
-//            ZipcastStartCommonPacket::new
     );
-
-    public void write(RegistryByteBuf buf) {
-        this.zipcastTarget.write(buf);
-    }
 
     @Override
     public Id<? extends CustomPayload> getId() {

@@ -27,12 +27,12 @@ public record ZipcastTarget(int playerId, Vec3d pos, Direction raycastSide, floa
     }
 
     public static ZipcastTarget ofPlayer(LivingEntity player, Vec3d pos, Direction raycastSide) {
-        float speed = 2.75f;
-        int startTicks = 8;
+        float speed = 2.25f;
+        int startTicks = 6;
 
         int minBuildupTicks = 12;
         int buildUpTicks = (int) MathHelper.clamp(minBuildupTicks + player.getVelocity().lengthSquared() * 10f, minBuildupTicks, 22);
-        int lerpTicks = MathHelper.clamp(buildUpTicks, 10, 15);
+        int lerpTicks = MathHelper.clamp(buildUpTicks - 8, 4, 12);
         return new ZipcastTarget(player.getId(), pos, raycastSide, speed, startTicks, lerpTicks, buildUpTicks);
     }
 
