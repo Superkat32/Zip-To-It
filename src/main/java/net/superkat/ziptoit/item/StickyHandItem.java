@@ -1,6 +1,5 @@
 package net.superkat.ziptoit.item;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -15,7 +14,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.superkat.ziptoit.ZipToIt;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
-import net.superkat.ziptoit.network.packets.ZipcastStartCommonPacket;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
 import net.superkat.ziptoit.zipcast.ZipcastTarget;
 
@@ -55,10 +53,10 @@ public class StickyHandItem extends Item {
         BlockHitResult raycast = ZipcastManager.raycastStickyHand(player, stickyHandStack, 0);
         if(raycast == null) return;
 
-        ZipcastTarget zipcastTarget = new ZipcastTarget(player.getId(), raycast);
-        zipcasterPlayer.ziptoit$zipcastToPos(zipcastTarget);
-        ClientPlayNetworking.send(new ZipcastStartCommonPacket(zipcastTarget));
+        ZipcastTarget zipcastTarget = ZipcastTarget.ofRaycast(player, raycast);
+        ZipcastManager.startZipcast(player, zipcastTarget, true);
 
+        // debug
         Vec3d pos = raycast.getPos();
         player.getWorld().addParticleClient(ParticleTypes.END_ROD, pos.getX(), pos.getY(), pos.getZ(), 0,0, 0);
     }

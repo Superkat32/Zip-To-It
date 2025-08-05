@@ -5,7 +5,13 @@ import net.superkat.ziptoit.zipcast.ZipcastTarget;
 
 public interface ZipcasterPlayer {
 
-    void ziptoit$zipcastToPos(ZipcastTarget zipcastTarget);
+    void ziptoit$startZipcast(ZipcastTarget zipcastTarget);
+
+    void ziptoit$endZipcast();
+
+    void ziptoit$stickToWall(Vec3d wallPos);
+
+    void ziptoit$endWallStick();
 
     void ziptoit$cancelZipcast();
 
@@ -21,14 +27,14 @@ public interface ZipcasterPlayer {
     ZipcastTarget zipcastTarget();
 
     void setZipcastTarget(ZipcastTarget zipcastTarget);
-//
-//    Vec3d zipcastPos();
-//
-//    void setZipcastPos(Vec3d zipcastPos);
-//
-//    float maxZipcastSpeed();
-//
-//    float currentZipcastSpeed();
+
+    boolean noClipForZipcast();
+
+    void setNoClipForZipcast(boolean noClipForZipcast);
+
+    boolean slowFallForZipcast();
+
+    void setSlowFallForZipcast(boolean slowFallForZipcast);
 
     int zipcastTicks();
 
@@ -45,9 +51,5 @@ public interface ZipcasterPlayer {
     default void increaseWallTicks() {
         this.setWallTicks(this.wallTicks() + 1);
     }
-
-    Vec3d lastZipcastVelocity();
-
-    void setLastZipcastVelocity(Vec3d velocity);
 
 }

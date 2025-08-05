@@ -1,28 +1,39 @@
 package net.superkat.ziptoit.zipcast;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-public record ZipcastTarget(int playerId, Vec3d target, Direction raycastSide, float speed) {
+public record ZipcastTarget(int playerId, Vec3d pos, Direction raycastSide, float speed, int startTicks, int lerpTicks, int buildupTicks) {
 
     public static final PacketCodec<RegistryByteBuf, ZipcastTarget> PACKET_CODEC = PacketCodec.tuple(
             PacketCodecs.INTEGER, ZipcastTarget::playerId,
-            Vec3d.PACKET_CODEC, ZipcastTarget::target,
+            Vec3d.PACKET_CODEC, ZipcastTarget::pos,
             Direction.PACKET_CODEC, ZipcastTarget::raycastSide,
             PacketCodecs.FLOAT, ZipcastTarget::speed,
+            PacketCodecs.INTEGER, ZipcastTarget::startTicks,
+            PacketCodecs.INTEGER, ZipcastTarget::lerpTicks,
+            PacketCodecs.INTEGER, ZipcastTarget::buildupTicks,
             ZipcastTarget::new
     );
 
-    public ZipcastTarget(int playerId, BlockHitResult raycast) {
-        this(playerId, raycast.getPos(), raycast.getSide());
+    public static ZipcastTarget ofRaycast(LivingEntity player, BlockHitResult raycast) {
+        return ofPlayer(player, raycast.getPos(), raycast.getSide());
     }
 
-    public ZipcastTarget(int playerId, Vec3d pos, Direction raycastSide) {
-        this(playerId, pos, raycastSide, 5f);
+    public static ZipcastTarget ofPlayer(LivingEntity player, Vec3d pos, Direction raycastSide) {
+        float speed = 2.75f;
+        int startTicks = 8;
+
+        int minBuildupTicks = 12;
+        int buildUpTicks = (int) MathHelper.clamp(minBuildupTicks + player.getVelocity().lengthSquared() * 10f, minBuildupTicks, 22);
+        int lerpTicks = MathHelper.clamp(buildUpTicks, 10, 15);
+        return new ZipcastTarget(player.getId(), pos, raycastSide, speed, startTicks, lerpTicks, buildUpTicks);
     }
 
     public void write(RegistryByteBuf buf) {

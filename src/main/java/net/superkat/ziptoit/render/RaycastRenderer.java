@@ -79,7 +79,7 @@ public class RaycastRenderer {
         //calculates length
         float length = (float) origin.distanceTo(target);
 
-        //rotates towards target from origin
+        //rotates towards pos from origin
         Vec3d transformedPos = target.subtract(origin);
         transformedPos = transformedPos.normalize();
         float rightAngle = (float) Math.toRadians(90);
@@ -90,9 +90,11 @@ public class RaycastRenderer {
 
         matrixStack.translate(xOffsetAmount, 0,0);
 
-        // FIXME - The current time thing was a test to see what this was doing, and it worked well ¯\_(ツ)_/¯
-        //  replace System.currentTimeMillis with actual, acceptable code... tomorrow
-        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((System.currentTimeMillis() % 5000) / 5000f * 360f));
+        // 100 is a random number - it only determines the rotation speed, and can be replaced for a different result
+//        float rotation = (MinecraftClient.getInstance().player.age % 100f) / 100f * 360f;
+        float rotation = ((MinecraftClient.getInstance().player.getItemUseTime() + 10) % 100f) / 100f * 360f;
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotation));
+
         drawTriangle(matrixStack.peek().getPositionMatrix(), consumer, width, -length, red, green, blue, alpha, light);
 
         matrixStack.pop();

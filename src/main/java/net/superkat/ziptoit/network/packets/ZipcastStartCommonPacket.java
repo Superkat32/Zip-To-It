@@ -14,7 +14,7 @@ public record ZipcastStartCommonPacket(ZipcastTarget zipcastTarget) implements C
             ZipcastTarget.PACKET_CODEC, ZipcastStartCommonPacket::zipcastTarget,
             ZipcastStartCommonPacket::new
 //            PacketCodecs.INTEGER, ZipcastStartCommonPacket::playerId,
-//            Vec3d.PACKET_CODEC, ZipcastStartCommonPacket::target,
+//            Vec3d.PACKET_CODEC, ZipcastStartCommonPacket::pos,
 //            Direction.PACKET_CODEC, ZipcastStartCommonPacket::raycastSide,
 //            ZipcastStartCommonPacket::new
     );
