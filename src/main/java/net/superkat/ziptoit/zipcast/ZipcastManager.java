@@ -3,19 +3,19 @@ package net.superkat.ziptoit.zipcast;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.ZipToIt;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.item.StickyHandComponent;
-import net.superkat.ziptoit.network.packets.WallStickCommonPacket;
+import net.superkat.ziptoit.network.packets.WallStickEndCommonPacket;
+import net.superkat.ziptoit.network.packets.WallStickStartCommonPacket;
+import net.superkat.ziptoit.network.packets.ZipcastCancelCommonPacket;
 import net.superkat.ziptoit.network.packets.ZipcastEndCommonPacket;
 import net.superkat.ziptoit.network.packets.ZipcastStartCommonPacket;
 import org.jetbrains.annotations.Nullable;
@@ -44,16 +44,16 @@ public class ZipcastManager {
 
         if(!sendPackets) return;
         if(player.getWorld().isClient) {
-            ZipcastClientHelper.sendC2SPacket(new ZipcastEndCommonPacket(player.getId(), false));
+            ZipcastClientHelper.sendC2SPacket(new ZipcastEndCommonPacket(player.getId()));
         } else {
             for (ServerPlayerEntity trackingPlayer : PlayerLookup.tracking(player)) {
                 if (trackingPlayer == player) continue;
-                ServerPlayNetworking.send(trackingPlayer, new ZipcastEndCommonPacket(player.getId(), false));
+                ServerPlayNetworking.send(trackingPlayer, new ZipcastEndCommonPacket(player.getId()));
             }
         }
     }
 
-    public static void stickToWall(LivingEntity player, Vec3d pos, boolean sendPackets) {
+    public static void startWallStick(LivingEntity player, Vec3d pos, boolean sendPackets) {
         if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
         zipcasterPlayer.ziptoit$stickToWall(pos);
@@ -65,106 +65,53 @@ public class ZipcastManager {
 
         if(!sendPackets) return;
         if(player.getWorld().isClient) {
-            ZipcastClientHelper.sendC2SPacket(new WallStickCommonPacket(player.getId(), pos));
+            ZipcastClientHelper.sendC2SPacket(new WallStickStartCommonPacket(player.getId(), pos));
         } else {
             for (ServerPlayerEntity trackingPlayer : PlayerLookup.tracking(player)) {
                 if (trackingPlayer == player) continue;
-                ServerPlayNetworking.send(trackingPlayer, new WallStickCommonPacket(player.getId(), pos));
+                ServerPlayNetworking.send(trackingPlayer, new WallStickStartCommonPacket(player.getId(), pos));
             }
         }
     }
 
-    public static void cancelZipcast(LivingEntity player, boolean sendPackets) {
+    public static void endWallStick(LivingEntity player, boolean jump, boolean sendPackets) {
+        if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
-    }
+        zipcasterPlayer.ziptoit$endWallStick();
 
-    public static void tickZipcasterPlayer(PlayerEntity player) {
-        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
-
-        if(zipcasterPlayer.noClipForZipcast()) {
-            player.noClip = true;
+        if (jump && player.isLogicalSideForUpdatingMovement()) {
+            player.setVelocity(0, 0.7f, 0);
         }
-
-        if(zipcasterPlayer.slowFallForZipcast()) {
-            if(player.isOnGround()) {
-                zipcasterPlayer.setSlowFallForZipcast(false);
-            }
+        if(player.getWorld().isClient) {
+            player.setSneaking(false);
         }
-    }
+        player.setNoGravity(false);
 
-    public static void travelZipcasting(PlayerEntity player, Vec3d movementInput) {
-        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
-
-        zipcasterPlayer.increaseZipcastTicks();
-        ZipcastTarget zipcastTarget = zipcasterPlayer.zipcastTarget();
-        Vec3d zipcastPos = zipcastTarget.pos();
-        Vec3d currentPos = player.getPos().add(0, 0.5, 0);
-
-        // Check to see if zipcast should be canceled
-        if(zipcasterPlayer.zipcastTicks() >= 200 || player.isSneaking()) {
-            // Sneaking is technically supposed to be an emergency exit in case my code messes up,
-            // but I think it allows for some fun uses elsewhere, so it's staying in
-            zipcasterPlayer.ziptoit$cancelZipcast();
-            return;
-        }
-
-        boolean end = false;
-        int zipcastTicks = zipcasterPlayer.zipcastTicks();
-        Vec3d currentVelocity = player.getVelocity();
-
-        // Speed of the zipcast based on how long it's been used
-        boolean lerpVelocity = false;
-        boolean ignoreNewVelocity = false;
-        float maxSpeed = zipcastTarget.speed();
-        int startTicks = zipcastTarget.startTicks(); // ticks to shoot the zipcast - only uses player's current velocity
-        int lerpTicks = zipcastTarget.lerpTicks(); // ticks to transition between pre-zipcast velocity and zipcast velocity
-        int buildupTicks = zipcastTarget.buildupTicks(); // ticks building up to max speed
-
-        if(zipcastTicks <= startTicks) {
-            maxSpeed = 0; // shooting animation is still playing
-            ignoreNewVelocity = true;
-        } else if (zipcastTicks <= buildupTicks) {
-            // player is now building up speed
-            maxSpeed *= (float) (zipcastTicks) / (buildupTicks);
-            if(zipcastTicks <= lerpTicks) {
-                lerpVelocity = true;
-            }
+        if(!sendPackets) return;
+        if(player.getWorld().isClient) {
+            ZipcastClientHelper.sendC2SPacket(new WallStickEndCommonPacket(player.getId(), jump));
         } else {
-            // player is now at max speed
-            zipcasterPlayer.setNoClipForZipcast(true);
-        }
-
-        // Get the new velocity to move the player towards the zipcast pos
-        Vec3d difference = zipcastPos.subtract(currentPos);
-        Vec3d normal = difference.normalize();
-        Vec3d newVelocity = normal.multiply(maxSpeed);
-
-        // Transition between the player's pre-zipcast velocity and the velocity caused by the zipcast
-        if(lerpVelocity) {
-            float lerpProgress = (float) (zipcastTicks - startTicks) / (lerpTicks - startTicks);
-            newVelocity = MathHelper.lerp(lerpProgress, currentVelocity, newVelocity);
-        }
-
-
-        if(zipcastTicks >= startTicks) {
-            end = currentPos.add(newVelocity).distanceTo(zipcastPos) <= 3f;
-        }
-
-        if(player.isLogicalSideForUpdatingMovement()) {
-            if (!ignoreNewVelocity) {
-                player.setVelocity(newVelocity);
+            for (ServerPlayerEntity trackingPlayer : PlayerLookup.tracking(player)) {
+                if (trackingPlayer == player) continue;
+                ServerPlayNetworking.send(trackingPlayer, new WallStickEndCommonPacket(player.getId(),  jump));
             }
-            player.move(MovementType.SELF, player.getVelocity());
-            player.tickBlockCollision(player.getLastRenderPos(), player.getPos());
-
         }
+    }
 
-        if(end && player.getWorld().isClient) {
-            tryStickingToWall(player, zipcastTarget);
-            if(player.isLogicalSideForUpdatingMovement()) {
-                player.setVelocity(Vec3d.ZERO);
+    public static void cancelZipcast(LivingEntity player, boolean hardCancel, boolean sendPackets) {
+        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+
+        zipcasterPlayer.ziptoit$softCancelZipcast();
+        if(hardCancel) zipcasterPlayer.ziptoit$hardCancelZipcast();
+
+        if(!sendPackets) return;
+        if(player.getWorld().isClient) {
+            ZipcastClientHelper.sendC2SPacket(new ZipcastCancelCommonPacket(player.getId(), hardCancel));
+        } else {
+            for (ServerPlayerEntity trackingPlayer : PlayerLookup.tracking(player)) {
+                if (trackingPlayer == player) continue;
+                ServerPlayNetworking.send(trackingPlayer, new ZipcastCancelCommonPacket(player.getId(),  hardCancel));
             }
-            endZipcast(player, true);
         }
     }
 
@@ -173,40 +120,9 @@ public class ZipcastManager {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
         if(!targetIsWallStickable(player, zipcastTarget)) return;
         Vec3d newPosition = zipcastTarget.pos().offset(zipcastTarget.raycastSide(), 0.5 * player.getScale());
-        stickToWall(player, newPosition, true);
+        startWallStick(player, newPosition, true);
         player.setVelocity(Vec3d.ZERO);
     }
-
-    public static void travelStickingToWall(PlayerEntity player, Vec3d movementInput) {
-        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
-        zipcasterPlayer.increaseWallTicks();
-
-        boolean jumping = player.isJumping();
-        boolean end = player.isSneaking() || zipcasterPlayer.wallTicks() >= 1200 || jumping;
-
-        if(end) {
-            endWallStick(player, jumping);
-        } else {
-            if(player.isLogicalSideForUpdatingMovement()) {
-                player.setVelocity(Vec3d.ZERO);
-                player.move(MovementType.SELF, player.getVelocity());
-            }
-        }
-
-    }
-
-    public static void endWallStick(PlayerEntity player, boolean jump) {
-        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
-
-        if (jump && player.isLogicalSideForUpdatingMovement()) {
-            player.setVelocity(0, 0.7f, 0);
-        }
-
-        zipcasterPlayer.setIsStickingToWall(false);
-        player.setSneaking(false);
-        player.setNoGravity(false);
-    }
-
 
     @Nullable
     public static BlockHitResult raycastStickyHand(LivingEntity entity, ItemStack stickyHand, float tickProgress) {
@@ -245,6 +161,7 @@ public class ZipcastManager {
 
     public static double postZipcastSlowfallAmountForPlayer(PlayerEntity player, double original) {
         return Math.min(original, 0.0625);
+//        return 0.025;
     }
 
 }

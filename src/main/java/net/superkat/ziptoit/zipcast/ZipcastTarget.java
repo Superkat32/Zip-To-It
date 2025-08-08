@@ -28,16 +28,14 @@ public record ZipcastTarget(int playerId, Vec3d pos, Direction raycastSide, floa
 
     public static ZipcastTarget ofPlayer(LivingEntity player, Vec3d pos, Direction raycastSide) {
         float speed = 2.25f;
-        int startTicks = 6;
+        double distanceToPos = player.getPos().distanceTo(pos);
+        double velocitySquared = player.getVelocity().lengthSquared();
 
-        int minBuildupTicks = 12;
-        int buildUpTicks = (int) MathHelper.clamp(minBuildupTicks + player.getVelocity().lengthSquared() * 10f, minBuildupTicks, 22);
+        int startTicks = (int) MathHelper.clamp(distanceToPos / 5, 5, 15);
+        int minBuildupTicks = Math.max(startTicks, 12);
+        int buildUpTicks = (int) MathHelper.clamp(startTicks + (distanceToPos / 10) + (velocitySquared * 5), minBuildupTicks, 22);
         int lerpTicks = MathHelper.clamp(buildUpTicks - 8, 4, 12);
         return new ZipcastTarget(player.getId(), pos, raycastSide, speed, startTicks, lerpTicks, buildUpTicks);
-    }
-
-    public void write(RegistryByteBuf buf) {
-        PACKET_CODEC.encode(buf, this);
     }
 
 }

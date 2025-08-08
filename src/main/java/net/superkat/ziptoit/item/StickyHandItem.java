@@ -7,6 +7,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -19,12 +21,33 @@ import net.superkat.ziptoit.zipcast.ZipcastTarget;
 
 public class StickyHandItem extends Item {
 
+    public static final int TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND = 1200; // 1 minute
+
     public StickyHandItem(Settings settings) {
         super(settings);
     }
 
     @Override
     public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        if(user instanceof ZipcasterPlayer zipcasterPlayer) {
+            if(zipcasterPlayer.shouldPlayZipcastActiveSound()) {
+                world.playSound(null, user.getX(), user.getY(), user.getZ(),
+                        SoundEvents.ITEM_TRIDENT_THUNDER.value(), SoundCategory.PLAYERS, 1f, 1.5f
+                );
+                world.playSound(null, user.getX(), user.getY(), user.getZ(),
+                        SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1f, 1f
+                );
+                world.playSound(null, user.getX(), user.getY(), user.getZ(),
+                        SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.5f, 2f
+                );
+                world.playSound(null, user.getX(), user.getY(), user.getZ(),
+                        SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2f, 1f
+                );
+                zipcasterPlayer.setTicksSinceZipcastActivate(0);
+            }
+        }
+
+
         ZipToIt.LOGGER.info("Using!");
         return ItemUsage.consumeHeldItem(world, user, hand);
     }

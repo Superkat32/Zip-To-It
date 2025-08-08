@@ -7,8 +7,10 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
+import net.superkat.ziptoit.item.StickyHandItem;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
 import net.superkat.ziptoit.zipcast.ZipcastTarget;
+import net.superkat.ziptoit.zipcast.ZipcasterMovement;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,10 +34,13 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Unique
     public int wallTicks = 0;
 
+    @Unique
+    public int ticksSinceLastZipcast = StickyHandItem.TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND;
+
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSpectator()Z"))
     public void ziptoit$tickZipcastPlayer(CallbackInfo ci) {
         PlayerEntity self = (PlayerEntity) (Object) this;
-        ZipcastManager.tickZipcasterPlayer(self);
+        ZipcasterMovement.tickZipcasterPlayer(self);
     }
 
     @WrapOperation(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;travel(Lnet/minecraft/util/math/Vec3d;)V"))
@@ -50,9 +55,9 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         }
 
         if(this.isZipcasting()) {
-            ZipcastManager.travelZipcasting(instance, movementInput);
+            ZipcasterMovement.travelZipcasting(instance, movementInput);
         } else if(this.isStickingToWall()) {
-            ZipcastManager.travelStickingToWall(instance, movementInput);
+            ZipcasterMovement.travelStickingToWall(instance, movementInput);
         } else {
             original.call(instance, movementInput);
         }
@@ -88,7 +93,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         this.wallTicks = 0;
         this.slowFallForZipcast = false;
 
-        ZipcastManager.endWallStick((PlayerEntity) (Object) this, false);
+        ZipcastManager.endWallStick((PlayerEntity) (Object) this, false, true);
     }
 
     @Override
@@ -111,15 +116,33 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     }
 
     @Override
-    public void ziptoit$cancelZipcast() {
+    public void ziptoit$softCancelZipcast() {
         this.zipcastTarget = null;
         this.zipcasting = false;
         this.stickingToWall = false;
         this.noClipForZipcast = false;
         this.zipcastTicks = 0;
         this.wallTicks = 0;
+
+        this.slowFallForZipcast = true;
+    }
+
+    @Override
+    public void ziptoit$hardCancelZipcast() {
+        this.ziptoit$softCancelZipcast();
         this.slowFallForZipcast = false;
     }
+
+//    @Override
+//    public void ziptoit$cancelZipcast() {
+//        this.zipcastTarget = null;
+//        this.zipcasting = false;
+//        this.stickingToWall = false;
+//        this.noClipForZipcast = false;
+//        this.zipcastTicks = 0;
+//        this.wallTicks = 0;
+//        this.slowFallForZipcast = false;
+//    }
 
     @Override
     public boolean isZipcasting() {
@@ -189,5 +212,17 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Override
     public void setWallTicks(int wallTicks) {
         this.wallTicks = wallTicks;
+    }
+
+
+
+    @Override
+    public int ticksSinceZipcastActivate() {
+        return this.ticksSinceLastZipcast;
+    }
+
+    @Override
+    public void setTicksSinceZipcastActivate(int ticksSinceLastZipcast) {
+        this.ticksSinceLastZipcast = ticksSinceLastZipcast;
     }
 }

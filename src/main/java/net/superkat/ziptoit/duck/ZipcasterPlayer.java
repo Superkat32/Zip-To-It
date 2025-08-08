@@ -1,6 +1,7 @@
 package net.superkat.ziptoit.duck;
 
 import net.minecraft.util.math.Vec3d;
+import net.superkat.ziptoit.item.StickyHandItem;
 import net.superkat.ziptoit.zipcast.ZipcastTarget;
 
 public interface ZipcasterPlayer {
@@ -13,7 +14,15 @@ public interface ZipcasterPlayer {
 
     void ziptoit$endWallStick();
 
-    void ziptoit$cancelZipcast();
+    /**
+     * Zipcasting, sorta-survival friendly canceling (gives slow falling)
+     */
+    void ziptoit$softCancelZipcast();
+
+    /**
+     * Full reset of zipcasting related fields
+     */
+    void ziptoit$hardCancelZipcast();
 
 
     boolean isZipcasting();
@@ -50,6 +59,18 @@ public interface ZipcasterPlayer {
 
     default void increaseWallTicks() {
         this.setWallTicks(this.wallTicks() + 1);
+    }
+
+    int ticksSinceZipcastActivate();
+
+    void setTicksSinceZipcastActivate(int ticksSinceLastZipcast);
+
+    default void increaseLastZipcastActivateTicks() {
+        this.setTicksSinceZipcastActivate(this.ticksSinceZipcastActivate() + 1);
+    }
+
+    default boolean shouldPlayZipcastActiveSound() {
+        return this.ticksSinceZipcastActivate() >= StickyHandItem.TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND;
     }
 
 }
