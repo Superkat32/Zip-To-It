@@ -12,6 +12,13 @@ public class ZipcasterMovement {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
         zipcasterPlayer.increaseLastZipcastActivateTicks();
 
+        if(zipcasterPlayer.isZipcasting()) {
+            zipcasterPlayer.increaseZipcastTicks();
+        }
+        if(zipcasterPlayer.isStickingToWall()) {
+            zipcasterPlayer.increaseWallTicks();
+        }
+
         if(zipcasterPlayer.noClipForZipcast()) {
             player.noClip = true;
         }
@@ -26,13 +33,12 @@ public class ZipcasterMovement {
     public static void travelZipcasting(PlayerEntity player, Vec3d movementInput) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
-        zipcasterPlayer.increaseZipcastTicks();
         ZipcastTarget zipcastTarget = zipcasterPlayer.zipcastTarget();
         Vec3d zipcastPos = zipcastTarget.pos();
         Vec3d currentPos = player.getPos().add(0, 0.5, 0);
 
         // Check to see if zipcast should be canceled
-        if(zipcasterPlayer.zipcastTicks() >= 200 || player.isSneaking()) {
+        if((zipcasterPlayer.zipcastTicks() >= 200 || player.isSneaking()) && player.isLogicalSideForUpdatingMovement()) {
             // Sneaking is technically supposed to be an emergency exit in case my code messes up,
             // but I think it allows for some fun uses elsewhere, so it's staying in
             player.playSound(SoundEvents.ITEM_TRIDENT_THUNDER.value(), 0.75f, 1f);
@@ -82,7 +88,6 @@ public class ZipcasterMovement {
             newVelocity = MathHelper.lerp(lerpProgress, currentVelocity, newVelocity);
         }
 
-
         if(zipcastTicks >= startTicks) {
             end = currentPos.add(newVelocity).distanceTo(zipcastPos) <= 3f;
         }
@@ -93,7 +98,6 @@ public class ZipcasterMovement {
             }
             player.move(MovementType.SELF, player.getVelocity());
             player.tickBlockCollision(player.getLastRenderPos(), player.getPos());
-
         }
 
         if(end && player.getWorld().isClient) {
@@ -108,7 +112,6 @@ public class ZipcasterMovement {
 
     public static void travelStickingToWall(PlayerEntity player, Vec3d movementInput) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
-        zipcasterPlayer.increaseWallTicks();
 
         boolean jumping = player.isJumping();
         boolean end = player.isSneaking() || zipcasterPlayer.wallTicks() >= 1200 || jumping;

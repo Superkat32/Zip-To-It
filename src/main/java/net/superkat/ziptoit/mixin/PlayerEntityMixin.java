@@ -37,7 +37,9 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Unique
     public int ticksSinceLastZipcast = StickyHandItem.TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND;
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSpectator()Z"))
+    // FIXME - First inject ticks twice, second inject misses noclip enabling
+//    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSpectator()Z"))
+    @Inject(method = "tick", at = @At(value = "HEAD"))
     public void ziptoit$tickZipcastPlayer(CallbackInfo ci) {
         PlayerEntity self = (PlayerEntity) (Object) this;
         ZipcasterMovement.tickZipcasterPlayer(self);
@@ -132,17 +134,6 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         this.ziptoit$softCancelZipcast();
         this.slowFallForZipcast = false;
     }
-
-//    @Override
-//    public void ziptoit$cancelZipcast() {
-//        this.zipcastTarget = null;
-//        this.zipcasting = false;
-//        this.stickingToWall = false;
-//        this.noClipForZipcast = false;
-//        this.zipcastTicks = 0;
-//        this.wallTicks = 0;
-//        this.slowFallForZipcast = false;
-//    }
 
     @Override
     public boolean isZipcasting() {

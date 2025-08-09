@@ -8,6 +8,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.superkat.ziptoit.duck.ZipcasterPlayer;
 
 public record ZipcastTarget(int playerId, Vec3d pos, Direction raycastSide, float speed, int startTicks, int lerpTicks, int buildupTicks) {
 
@@ -30,8 +31,9 @@ public record ZipcastTarget(int playerId, Vec3d pos, Direction raycastSide, floa
         float speed = 2.25f;
         double distanceToPos = player.getPos().distanceTo(pos);
         double velocitySquared = player.getVelocity().lengthSquared();
+        boolean inAir = !player.isOnGround() && (player instanceof ZipcasterPlayer zipcasterPlayer && !zipcasterPlayer.isStickingToWall());
 
-        int startTicks = (int) MathHelper.clamp(distanceToPos / 5, 5, 15);
+        int startTicks = (int) MathHelper.clamp(distanceToPos / 5, 5, 15) + (inAir ? 2 : 0);
         int minBuildupTicks = Math.max(startTicks, 12);
         int buildUpTicks = (int) MathHelper.clamp(startTicks + (distanceToPos / 10) + (velocitySquared * 5), minBuildupTicks, 22);
         int lerpTicks = MathHelper.clamp(buildUpTicks - 8, 4, 12);

@@ -16,13 +16,13 @@ public class ServerPlayNetworkHandlerMixin {
 
     @ModifyExpressionValue(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;isInTeleportationState()Z"))
     public boolean lieToServerThatWeAreActuallySimplyTeleportingAndAreDefinitelyNotPreformingAnyShenanigansToPreventRubberbanding(boolean actuallyTeleporting) {
-        boolean zipcasting = false;
+        boolean fakeTeleporting = false;
         ServerPlayNetworkHandler self = (ServerPlayNetworkHandler) (Object) this;
         if(self.player instanceof ZipcasterPlayer zipcasterPlayer) {
-            zipcasting = zipcasterPlayer.isZipcasting();
+            fakeTeleporting = zipcasterPlayer.isZipcasting() || zipcasterPlayer.isStickingToWall();
         }
 
-        return actuallyTeleporting || zipcasting;
+        return actuallyTeleporting || fakeTeleporting;
     }
 
 }

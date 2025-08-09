@@ -49,7 +49,8 @@ public class RaycastRenderer {
         boolean firstPerson = client.options.getPerspective().isFirstPerson() && player == MinecraftClient.getInstance().player;
         float offsetAmount = firstPerson ? 1 : 0.05f;
         float xOffset = getArmHoldingStickyHand(player) == Arm.RIGHT ? offsetAmount : -offsetAmount;
-        renderSimpleLine(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_LINE), playerPos.add(0, 0.5, 0), raycastPos, 0.1f, xOffset, 1f, 0f, 0f, 1f);
+        float yOffset = firstPerson ? 0.5f : 1f;
+        renderSimpleLine(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_LINE), playerPos.add(0, yOffset, 0), raycastPos, 0.1f, xOffset, 1f, 0f, 0f, 1f);
         matrices.pop();
 
         matrices.push();
