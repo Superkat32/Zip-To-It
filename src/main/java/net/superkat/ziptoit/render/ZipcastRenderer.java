@@ -48,6 +48,8 @@ public class ZipcastRenderer {
 
     // This is a slightly modified version of my line renderer for Jet Lag(an unreleased for now:tm: mod)
     // https://github.com/Superkat32/Jet-Lag/blob/master/src/main/java/net/superkat/jetlag/rendering/ContrailRenderer.java#L232
+    // It's basically just playing a game of connect the dots,
+    // taking advantage of VertexFormat.DrawMode.TRIANGLE_STRIP's shared vertices
     public static void renderZipcastLine(MatrixStack matrices, VertexConsumer consumer, Camera camera, List<ZipcastPoint> points, ZipcastTarget zipcastTarget, float tickProgress) {
         int light = LightmapTextureManager.pack(15, 15);
 //        Vec3d cameraPos = camera.getPos();
@@ -162,18 +164,6 @@ public class ZipcastRenderer {
             points.add(new ZipcastPoint(vec3d, offset));
         }
 
-        return points;
-    }
-
-    public static List<Vec3d> subdivideLine(Vec3d pos, Vec3d target, int subdivisions) {
-        List<Vec3d> points = new ArrayList<>();
-        Vec3d difference = pos.subtract(target);
-        float subdivisionAmount = (float) 1 / subdivisions;
-        for (int i = 0; i < subdivisions; i++) {
-            float subdivideAmount = subdivisionAmount * i;
-            Vec3d point = target.add(difference.multiply(subdivideAmount));
-            points.add(point);
-        }
         return points;
     }
 
