@@ -55,7 +55,7 @@ public class RaycastRenderer {
 
         matrices.push();
         matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-        renderCube(matrices, consumer.getBuffer(ZipToItRenderLayers.TARGET_BOX), raycastPos, 0.75f, 1f, 0f, 0f, 0.8f);
+        renderCube(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_TARGET_BOX), raycastPos, 0.75f, 1f, 0f, 0f, 0.8f);
         matrices.pop();
     }
 

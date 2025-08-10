@@ -7,10 +7,14 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.LightType;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.zipcast.ZipcastTarget;
 import org.joml.Matrix4f;
@@ -19,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ZipcastRenderer {
+
+    private static final int MAX_LIGHT = LightmapTextureManager.pack(15, 15);
 
     public static void render(WorldRenderContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -36,52 +42,73 @@ public class ZipcastRenderer {
         MinecraftClient client = MinecraftClient.getInstance();
         if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
-        VertexConsumerProvider consumer = context.consumers();
+        VertexConsumerProvider consumers = context.consumers();
         MatrixStack matrices = context.matrixStack();
         Camera camera = context.camera();
         float tickProgress = context.tickCounter().getTickProgress(true);
         ZipcastTarget zipcastTarget = zipcasterPlayer.zipcastTarget();
 
         List<ZipcastPoint> zipcastPoints = getZipcastPoints(player, 8, tickProgress);
-        renderZipcastLine(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_LINE), camera, zipcastPoints, zipcastTarget, tickProgress);
+        renderZipcastLine(matrices, consumers.getBuffer(ZipToItRenderLayers.ZIPCAST_LINE), camera, zipcastPoints, zipcastTarget, tickProgress, 45f);
+        renderZipcastLine(matrices, consumers.getBuffer(ZipToItRenderLayers.ZIPCAST_LINE), camera, zipcastPoints, zipcastTarget, tickProgress, -45f);
+//        renderDebugZipcastLine(matrices, consumers.getBuffer(ZipToItRenderLayers.RAYCAST_TARGET_BOX), camera, zipcastPoints, zipcastTarget, tickProgress);
+        renderZipcastCube(matrices, consumers.getBuffer(ZipToItRenderLayers.RAYCAST_TARGET_BOX), camera, zipcastTarget, zipcastPoints.getLast().pos());
     }
 
     // This is a slightly modified version of my line renderer for Jet Lag(an unreleased for now:tm: mod)
     // https://github.com/Superkat32/Jet-Lag/blob/master/src/main/java/net/superkat/jetlag/rendering/ContrailRenderer.java#L232
     // It's basically just playing a game of connect the dots,
     // taking advantage of VertexFormat.DrawMode.TRIANGLE_STRIP's shared vertices
-    public static void renderZipcastLine(MatrixStack matrices, VertexConsumer consumer, Camera camera, List<ZipcastPoint> points, ZipcastTarget zipcastTarget, float tickProgress) {
-        int light = LightmapTextureManager.pack(15, 15);
-//        Vec3d cameraPos = camera.getPos();
-//        boolean debug = true;
-
+    public static void renderZipcastLine(MatrixStack matrices, VertexConsumer consumer, Camera camera, List<ZipcastPoint> points, ZipcastTarget zipcastTarget, float tickProgress, float rotation) {;
         for (int i = 0; i < points.size() - 1; i++) {
-            boolean last = i == 0;
+            boolean first = i == 0;
+            boolean last = i == (points.size() - 1);
             ZipcastPoint zipcastPoint = points.get(i);
-            ZipcastPoint targetZipcastPoint = points.get(i + (last ? 0 : 1));
+            ZipcastPoint targetZipcastPoint = points.get(i + 1);
 
             Vec3d pos = zipcastPoint.pos;
             Vec3d target = targetZipcastPoint.pos;
-
-            renderLineSegment(matrices, consumer, pos, target, 1f, 0f, 0f, 1f, light, 0.2f, zipcastPoint.offset);
-//            matrices.push();
-//            Vec3d point = zipcastPoint.pos();
-//
-//            matrices.translate(zipcastPoint.offset(), 0, 0);
-//            matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-//            if(debug) {
-//                float greenPerPoint = 1f / points.size();
-//                float green = greenPerPoint * points.indexOf(zipcastPoint);
-//                RaycastRenderer.renderCube(matrices, consumer, point, 0.5f, 0f, green, 1f, 0.8f);
-//            }
-//
-//            matrices.pop();
+            int light = getLight(pos, 7);
+            renderLineSegment(matrices, consumer, pos, target, 1f, first ? 1f : 0f, last ? 1f : 0f, 1f, light, 0.15f, zipcastPoint.offset, rotation);
         }
     }
 
-    private static void renderLineSegment(MatrixStack matrixStack, VertexConsumer consumer, Vec3d origin, Vec3d target, float red, float green, float blue, float alpha, int light, float width, float xOffsetAmount) {
+    public static void renderZipcastCube(MatrixStack matrices, VertexConsumer consumer, Camera camera, ZipcastTarget zipcastTarget, Vec3d target) {
+        matrices.push();
+        matrices.translate(-camera.getPos().x, -camera.getPos().y, -camera.getPos().z);
+        drawCube(matrices, consumer, target, 0.4f, 1f, 0f, 0f, 1f, MAX_LIGHT);
+        matrices.pop();
+    }
+
+    public static void renderDebugZipcastLine(MatrixStack matrices, VertexConsumer consumer, Camera camera, List<ZipcastPoint> points, ZipcastTarget zipcastTarget, float tickProgress) {
+        Vec3d cameraPos = camera.getPos();
+        for (ZipcastPoint zipcastPoint : points) {
+            matrices.push();
+            Vec3d point = zipcastPoint.pos();
+
+            matrices.translate(zipcastPoint.offset(), 0, 0);
+            matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+            float greenPerPoint = 1f / points.size();
+            float green = greenPerPoint * points.indexOf(zipcastPoint);
+            RaycastRenderer.renderCube(matrices, consumer, point, 0.5f, 0f, green, 1f, 0.8f);
+            matrices.pop();
+        }
+    }
+
+    private static void drawCube(MatrixStack matrices, VertexConsumer consumer, Vec3d pos, float size, float red, float green, float blue, float alpha, int light) {
+        float halfSize = size / 2f;
+        VertexRendering.drawFilledBox(
+                matrices, consumer,
+                pos.getX() - halfSize, pos.getY() - halfSize, pos.getZ() - halfSize,
+                pos.getX() + halfSize, pos.getY() + halfSize, pos.getZ() + halfSize,
+                red, green, blue, alpha
+        );
+    }
+
+    private static void renderLineSegment(MatrixStack matrixStack, VertexConsumer consumer, Vec3d origin, Vec3d target, float red, float green, float blue, float alpha, int light, float width, float xOffset, float rotation) {
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
         Vec3d transformedMatrixPos = origin.subtract(camera.getPos());
+        boolean firstPerson = MinecraftClient.getInstance().options.getPerspective().isFirstPerson();
         matrixStack.push();
 
         //offsets to the origin's pos
@@ -99,7 +126,8 @@ public class ZipcastRenderer {
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Math.toDegrees(rightAngle - o))); //rotates left/right
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Math.toDegrees(rightAngle + n))); //rotates up/down
 
-        matrixStack.translate(xOffsetAmount, 0,0);
+        matrixStack.translate(xOffset, 0, 0);
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotation));
 
         drawTriangle(matrixStack.peek().getPositionMatrix(), consumer, width, -length, red, green, blue, alpha, light);
 
@@ -108,12 +136,12 @@ public class ZipcastRenderer {
 
     private static void drawTriangle(Matrix4f matrix, VertexConsumer vertexConsumer, float width, float length, float red, float green, float blue, float alpha, int light) {
         vertexConsumer.vertex(matrix, width / 2f, 0, length)
-                .color(red, green, blue, alpha);
+                .color(red, green, blue, alpha).light(light);
         vertexConsumer.vertex(matrix, -width / 2f, 0, length)
-                .color(red, green, blue, alpha);
+                .color(red, green, blue, alpha).light(light);
     }
 
-    // FIXME - I believe this goes from "target -> playerPos" instead of "playerPos -> target"
+    // Should be "playerPos -> targetPos" in terms of list order
     public static List<ZipcastPoint> getZipcastPoints(AbstractClientPlayerEntity player, int subdivisions, float tickProgress) {
         if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return List.of();
         int zipcastTicks = zipcasterPlayer.zipcastTicks();
@@ -129,21 +157,25 @@ public class ZipcastRenderer {
         Vec3d playerPos = player.getLerpedPos(tickProgress).add(0, 0.5, 0);
         Vec3d zipcastTargetPos = zipcastTarget.pos();
         Vec3d targetPos = zipcastTargetPos;
-        Vec3d difference = playerPos.subtract(targetPos);
+        Vec3d difference = targetPos.subtract(playerPos);
         boolean playerIsSelf = player.isMainPlayer();
 
+        // Shoot animation (simply bringing back the targetPos some)
         if(zipcastTicks <= shootTicks) {
-            float targetFallbackAmount = 1f - MathHelper.clamp((float) zipcastTicks / shootTicks, 0f, 1f);
-            targetPos = targetPos.add(difference.multiply(targetFallbackAmount));
-            difference = playerPos.subtract(targetPos);
+            float targetFallbackAmount = MathHelper.clamp((float) zipcastTicks / shootTicks, 0f, 1f);
+            targetPos = playerPos.add(difference.multiply(targetFallbackAmount));
+            difference = targetPos.subtract(playerPos);
         }
 
+        // Wobble effects
         float tickMultiplier = 1f;
         float offsetMultiplier = 0f;
         if(zipcastTicks <= wobbleTicks) {
+            // Huge wobble during shoot
             offsetMultiplier = (1f - ((float) zipcastTicks / wobbleTicks)) / 2f;
             tickMultiplier = 3;
         } else if (zipcastTicks >= wobbleUntilLandTicks) {
+            // Small wobble during actual zipcast
             float distanceToTarget = (float) playerPos.distanceTo(zipcastTargetPos);
             float distanceOffset = 5f / MathHelper.clamp(distanceToTarget, 5f, 100f);
             offsetMultiplier = MathHelper.clamp(distanceOffset, 0f, 0.35f) / 3f;
@@ -151,15 +183,20 @@ public class ZipcastRenderer {
         }
 
         if(!playerIsSelf) {
+            // Exaggerate effect for other players
             offsetMultiplier *= 2f;
         }
 
         List<ZipcastPoint> points = new ArrayList<>();
         float subdivisionAmount = 1f / subdivisions;
+        // Always ensure the point at the player is rendered correctly
+        points.add(new ZipcastPoint(playerPos.add(difference.multiply(-0.05f)), 0));
 
+        // Subdivide the line into many different points, then apply the wobble offset to each point
+        // These points will then be rendered in one connected line, so they must be in order!
         for (int i = 0; i <= subdivisions; i++) {
             float subdivideAmount = subdivisionAmount * i;
-            Vec3d vec3d = targetPos.add(difference.multiply(subdivideAmount));
+            Vec3d vec3d = playerPos.add(difference.multiply(subdivideAmount));
             float offset = MathHelper.sin(zipcastTicks * tickMultiplier + i) * offsetMultiplier;
             points.add(new ZipcastPoint(vec3d, offset));
         }
@@ -168,5 +205,14 @@ public class ZipcastRenderer {
     }
 
     public static record ZipcastPoint(Vec3d pos, float offset) {}
+
+    public static int getLight(Vec3d pos, int minLight) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        ClientWorld world = client.world;
+        BlockPos blockPos = BlockPos.ofFloored(pos);
+        int blockLight = world.getLightLevel(LightType.BLOCK, blockPos);
+        int skyLevel = world.getLightLevel(LightType.SKY, blockPos);
+        return LightmapTextureManager.pack(Math.max(blockLight, minLight), skyLevel);
+    }
 
 }
