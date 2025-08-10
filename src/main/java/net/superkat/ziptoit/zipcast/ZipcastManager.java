@@ -10,9 +10,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.superkat.ziptoit.ZipToIt;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.item.StickyHandComponent;
+import net.superkat.ziptoit.item.ZipToItItems;
 import net.superkat.ziptoit.network.packets.WallStickEndCommonPacket;
 import net.superkat.ziptoit.network.packets.WallStickStartCommonPacket;
 import net.superkat.ziptoit.network.packets.ZipcastCancelCommonPacket;
@@ -126,7 +126,7 @@ public class ZipcastManager {
 
     @Nullable
     public static BlockHitResult raycastStickyHand(LivingEntity entity, ItemStack stickyHand, float tickProgress) {
-        StickyHandComponent component = stickyHand.get(ZipToIt.STICKY_HAND_COMPONENT_TYPE);
+        StickyHandComponent component = stickyHand.get(ZipToItItems.STICKY_HAND_COMPONENT_TYPE);
 
         int zipRange = 48;
         if(component != null) zipRange = component.zipRange();
@@ -139,7 +139,7 @@ public class ZipcastManager {
     }
 
     public static boolean playerIsAimingZipcaster(PlayerEntity player) {
-        return player.isUsingItem() && player.getActiveItem().isOf(ZipToIt.STICKY_HAND_ITEM);
+        return player.isUsingItem() && player.getActiveItem().isIn(ZipToItItems.STICKY_HANDS);
     }
 
     public static boolean targetIsWallStickable(PlayerEntity player, ZipcastTarget zipcastTarget) {

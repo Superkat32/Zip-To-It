@@ -37,12 +37,19 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Unique
     public int ticksSinceLastZipcast = StickyHandItem.TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND;
 
-    // FIXME - First inject ticks twice, second inject misses noclip enabling
-//    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSpectator()Z"))
     @Inject(method = "tick", at = @At(value = "HEAD"))
     public void ziptoit$tickZipcastPlayer(CallbackInfo ci) {
         PlayerEntity self = (PlayerEntity) (Object) this;
         ZipcasterMovement.tickZipcasterPlayer(self);
+    }
+
+    // The first tick method can't change noClip because it'll be changed right back to default,
+    // but this tick method gets called twice per tick, which isn't okay for the normal tickZipcasterPlayer method
+    // So, the mixins are split up
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSpectator()Z"))
+    public void ziptoit$tickZipcastPlayerForNoClip(CallbackInfo ci) {
+        PlayerEntity self = (PlayerEntity) (Object) this;
+        ZipcasterMovement.tickZipcasterPlayerForNoClip(self);
     }
 
     @WrapOperation(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;travel(Lnet/minecraft/util/math/Vec3d;)V"))

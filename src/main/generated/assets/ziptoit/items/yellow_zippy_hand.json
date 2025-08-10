@@ -3,11 +3,11 @@
     "type": "minecraft:condition",
     "on_false": {
       "type": "minecraft:model",
-      "model": "ziptoit:item/sticky_hand"
+      "model": "ziptoit:item/yellow_zippy_hand"
     },
     "on_true": {
       "type": "minecraft:model",
-      "model": "ziptoit:item/sticky_hand_aiming"
+      "model": "ziptoit:item/yellow_zippy_hand_using"
     },
     "property": "minecraft:using_item"
   }

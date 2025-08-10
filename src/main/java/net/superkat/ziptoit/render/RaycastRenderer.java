@@ -13,10 +13,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.superkat.ziptoit.ZipToIt;
+import net.superkat.ziptoit.item.StickyHandComponent;
+import net.superkat.ziptoit.item.ZipToItItems;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
+import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 import org.joml.Matrix4f;
 
 public class RaycastRenderer {
@@ -40,9 +43,12 @@ public class RaycastRenderer {
         ClientPlayerEntity player = client.player;
         VertexConsumerProvider consumer = context.consumers();
         MatrixStack matrices = context.matrixStack();
+        ZipcastColor zipcastColor = stickyHand.getComponents().getOrDefault(ZipToItItems.STICKY_HAND_COMPONENT_TYPE, StickyHandComponent.DEFAULT).zipcastColor();
         Vec3d cameraPos = context.camera().getPos();
         Vec3d playerPos = player.getLerpedPos(tickProgress);
         Vec3d raycastPos = raycast.getPos();
+
+        int previewColor = zipcastColor.previewColor();
 
         // Ever so slightly cursed but its ModFest its fine
         matrices.push();
@@ -50,26 +56,26 @@ public class RaycastRenderer {
         float offsetAmount = firstPerson ? 1 : 0.05f;
         float xOffset = getArmHoldingStickyHand(player) == Arm.RIGHT ? offsetAmount : -offsetAmount;
         float yOffset = firstPerson ? 0.5f : 1f;
-        renderSimpleLine(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_LINE), playerPos.add(0, yOffset, 0), raycastPos, 0.1f, xOffset, 1f, 0f, 0f, 1f);
+        renderSimpleLine(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_LINE), playerPos.add(0, yOffset, 0), raycastPos, 0.1f, xOffset, previewColor);
         matrices.pop();
 
         matrices.push();
         matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-        renderCube(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_TARGET_BOX), raycastPos, 0.75f, 1f, 0f, 0f, 0.8f);
+        renderCube(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_TARGET_BOX), raycastPos, 0.75f, previewColor, 0.7f);
         matrices.pop();
     }
 
     // This is a slightly modified version of my line renderer for Jet Lag(an unreleased for now:tm: mod)
     // https://github.com/Superkat32/Jet-Lag/blob/master/src/main/java/net/superkat/jetlag/rendering/ContrailRenderer.java#L232
-    public static void renderSimpleLine(MatrixStack matrixStack, VertexConsumer consumer, Vec3d origin, Vec3d target, float width, float xOffsetAmount, float red, float green, float blue, float alpha) {
+    public static void renderSimpleLine(MatrixStack matrixStack, VertexConsumer consumer, Vec3d origin, Vec3d target, float width, float xOffsetAmount, int color) {
         // Normally, there'd be more than 2 points in this list, but because there's only two, this was my best workaround
         int light = LightmapTextureManager.pack(15, 15);
-        renderLineSegment(matrixStack, consumer, origin, target, red, green, blue, alpha, light, width, 0);
-        renderLineSegment(matrixStack, consumer, target, origin, red, green, blue, alpha, light, width, xOffsetAmount);
+        renderLineSegment(matrixStack, consumer, origin, target, color, light, width, 0);
+        renderLineSegment(matrixStack, consumer, target, origin, color, light, width, xOffsetAmount);
     }
 
     // Target & origin may be swapped? Don't know don't care it just works now ¯\_(ツ)_/¯ (that's gonna hurt me later isn't it)
-    private static void renderLineSegment(MatrixStack matrixStack, VertexConsumer consumer, Vec3d origin, Vec3d target, float red, float green, float blue, float alpha, int light, float width, float xOffsetAmount) {
+    private static void renderLineSegment(MatrixStack matrixStack, VertexConsumer consumer, Vec3d origin, Vec3d target, int color, int light, float width, float xOffsetAmount) {
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
         Vec3d transformedMatrixPos = origin.subtract(camera.getPos());
         matrixStack.push();
@@ -96,20 +102,23 @@ public class RaycastRenderer {
         float rotation = ((MinecraftClient.getInstance().player.getItemUseTime() + 10) % 100f) / 100f * 360f;
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotation));
 
-        drawTriangle(matrixStack.peek().getPositionMatrix(), consumer, width, -length, red, green, blue, alpha, light);
+        drawTriangle(matrixStack.peek().getPositionMatrix(), consumer, width, -length, color, light);
 
         matrixStack.pop();
     }
 
-    private static void drawTriangle(Matrix4f matrix, VertexConsumer vertexConsumer, float width, float length, float red, float green, float blue, float alpha, int light) {
+    private static void drawTriangle(Matrix4f matrix, VertexConsumer vertexConsumer, float width, float length, int color, int light) {
         vertexConsumer.vertex(matrix, width / 2f, 0, length)
-                .color(red, green, blue, alpha);
+                .color(color);
         vertexConsumer.vertex(matrix, -width / 2f, 0, length)
-                .color(red, green, blue, alpha);
+                .color(color);
     }
 
-    public static void renderCube(MatrixStack matrices, VertexConsumer consumer, Vec3d pos, float size, float red, float green, float blue, float alpha) {
+    public static void renderCube(MatrixStack matrices, VertexConsumer consumer, Vec3d pos, float size, int color, float alpha) {
         float halfSize = size / 2f;
+        float red = ColorHelper.getRedFloat(color);
+        float green = ColorHelper.getGreenFloat(color);
+        float blue = ColorHelper.getBlueFloat(color);
         VertexRendering.drawFilledBox(
                 matrices, consumer,
                 pos.getX() - halfSize, pos.getY() - halfSize, pos.getZ() - halfSize,
@@ -119,7 +128,7 @@ public class RaycastRenderer {
     }
 
     private static Arm getArmHoldingStickyHand(PlayerEntity player) {
-        return player.getMainHandStack().getItem().getDefaultStack().isOf(ZipToIt.STICKY_HAND_ITEM) ? player.getMainArm() : player.getMainArm().getOpposite();
+        return player.getMainHandStack().getItem().getDefaultStack().isIn(ZipToItItems.STICKY_HANDS) ? player.getMainArm() : player.getMainArm().getOpposite();
     }
 
 }

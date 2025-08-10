@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld_rod",
   "textures": {
-    "layer0": "ziptoit:item/sticky_hand_aiming"
+    "layer0": "ziptoit:item/yellow_zippy_hand_using"
   }
 }

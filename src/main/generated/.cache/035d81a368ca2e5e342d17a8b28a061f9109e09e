@@ -1,4 +1,7 @@
 // 1.21.8	-999999999-01-01T00:00:00	Zip To It/Model Definitions
-0a71328692c0f828bb66b6293f434496df6e6163 assets/ziptoit/items/sticky_hand.json
-6566f9ce78f6d87213132b2f31c00e4fda305892 assets/ziptoit/models/item/sticky_hand.json
-fb79eb42f2481bb46cdbca2ea0ce611563e886c3 assets/ziptoit/models/item/sticky_hand_aiming.json
+f7d30652c5e9868be075d91199e8730faa954f45 assets/ziptoit/items/red_zippy_hand.json
+8e13e07b9537f7248ea0d184af7fe353dd160bb4 assets/ziptoit/items/yellow_zippy_hand.json
+23230b336351c368ba376bd62b7ec5ce12bc0dff assets/ziptoit/models/item/red_zippy_hand.json
+e9f164cb5973b9208b583136e0bc5ea2e4c9d228 assets/ziptoit/models/item/red_zippy_hand_using.json
+49b25d40b7c939268442aede3693bd45523a8f9a assets/ziptoit/models/item/yellow_zippy_hand.json
+a7e5e65a1ebbe842bd56cb36af10401e9a4a2209 assets/ziptoit/models/item/yellow_zippy_hand_using.json

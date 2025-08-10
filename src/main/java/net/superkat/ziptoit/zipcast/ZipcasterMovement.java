@@ -19,14 +19,17 @@ public class ZipcasterMovement {
             zipcasterPlayer.increaseWallTicks();
         }
 
-        if(zipcasterPlayer.noClipForZipcast()) {
-            player.noClip = true;
-        }
-
         if(zipcasterPlayer.slowFallForZipcast()) {
             if(player.isOnGround()) {
                 zipcasterPlayer.setSlowFallForZipcast(false);
             }
+        }
+    }
+
+    public static void tickZipcasterPlayerForNoClip(PlayerEntity player) {
+        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+        if(zipcasterPlayer.noClipForZipcast()) {
+            player.noClip = true;
         }
     }
 

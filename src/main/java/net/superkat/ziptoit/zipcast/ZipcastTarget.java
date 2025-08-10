@@ -9,11 +9,15 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
+import net.superkat.ziptoit.item.StickyHandComponent;
+import net.superkat.ziptoit.item.ZipToItItems;
+import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 
-public record ZipcastTarget(int playerId, Vec3d pos, Direction raycastSide, float speed, int startTicks, int lerpTicks, int buildupTicks) {
+public record ZipcastTarget(int playerId, ZipcastColor color, Vec3d pos, Direction raycastSide, float speed, int startTicks, int lerpTicks, int buildupTicks) {
 
     public static final PacketCodec<RegistryByteBuf, ZipcastTarget> PACKET_CODEC = PacketCodec.tuple(
             PacketCodecs.INTEGER, ZipcastTarget::playerId,
+            ZipcastColor.PACKET_CODEC, ZipcastTarget::color,
             Vec3d.PACKET_CODEC, ZipcastTarget::pos,
             Direction.PACKET_CODEC, ZipcastTarget::raycastSide,
             PacketCodecs.FLOAT, ZipcastTarget::speed,
@@ -28,7 +32,9 @@ public record ZipcastTarget(int playerId, Vec3d pos, Direction raycastSide, floa
     }
 
     public static ZipcastTarget ofPlayer(LivingEntity player, Vec3d pos, Direction raycastSide) {
-        float speed = 2.25f;
+        ZipcastColor color = player.getActiveItem().getOrDefault(ZipToItItems.STICKY_HAND_COMPONENT_TYPE, StickyHandComponent.DEFAULT).zipcastColor();
+
+        float speed = player.getActiveItem().getOrDefault(ZipToItItems.STICKY_HAND_COMPONENT_TYPE, StickyHandComponent.DEFAULT).zipSpeed();
         double distanceToPos = player.getPos().distanceTo(pos);
         double velocitySquared = player.getVelocity().lengthSquared();
         boolean inAir = !player.isOnGround() && (player instanceof ZipcasterPlayer zipcasterPlayer && !zipcasterPlayer.isStickingToWall());
@@ -37,7 +43,7 @@ public record ZipcastTarget(int playerId, Vec3d pos, Direction raycastSide, floa
         int minBuildupTicks = Math.max(startTicks, 12);
         int buildUpTicks = (int) MathHelper.clamp(startTicks + (distanceToPos / 10) + (velocitySquared * 5), minBuildupTicks, 22);
         int lerpTicks = MathHelper.clamp(buildUpTicks - 8, 4, 12);
-        return new ZipcastTarget(player.getId(), pos, raycastSide, speed, startTicks, lerpTicks, buildUpTicks);
+        return new ZipcastTarget(player.getId(), color, pos, raycastSide, speed, startTicks, lerpTicks, buildUpTicks);
     }
 
 }

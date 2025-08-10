@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld_rod",
+  "textures": {
+    "layer0": "ziptoit:item/red_zippy_hand_using"
+  }
+}
