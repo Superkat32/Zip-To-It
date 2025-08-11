@@ -12,7 +12,7 @@ import net.superkat.ziptoit.network.packets.ZipcastCancelCommonPacket;
 import net.superkat.ziptoit.network.packets.ZipcastEndCommonPacket;
 import net.superkat.ziptoit.network.packets.ZipcastStartCommonPacket;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
-import net.superkat.ziptoit.zipcast.ZipcastTarget;
+import net.superkat.ziptoit.zipcast.movement.ZipcastTarget;
 
 public class ZipToItServerNetworkHandler {
 

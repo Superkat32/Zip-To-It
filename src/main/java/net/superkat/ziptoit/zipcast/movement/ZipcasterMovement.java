@@ -1,4 +1,4 @@
-package net.superkat.ziptoit.zipcast;
+package net.superkat.ziptoit.zipcast.movement;
 
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -6,6 +6,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
+import net.superkat.ziptoit.zipcast.ZipcastManager;
+import net.superkat.ziptoit.zipcast.line.ZipcastLine;
 
 public class ZipcasterMovement {
     public static void tickZipcasterPlayer(PlayerEntity player) {
@@ -14,6 +16,11 @@ public class ZipcasterMovement {
 
         if(zipcasterPlayer.isZipcasting()) {
             zipcasterPlayer.increaseZipcastTicks();
+
+            if(player.getWorld().isClient && zipcasterPlayer.getZipcastLine() != null) {
+                ZipcastLine zipcastLine = zipcasterPlayer.getZipcastLine();
+                zipcastLine.tickPoints();
+            }
         }
         if(zipcasterPlayer.isStickingToWall()) {
             zipcasterPlayer.increaseWallTicks();
@@ -92,6 +99,7 @@ public class ZipcasterMovement {
         }
 
         if(zipcastTicks >= startTicks) {
+            // FIXME - If moving faster than default speed, this can break
             end = currentPos.add(newVelocity).distanceTo(zipcastPos) <= 3f;
         }
 

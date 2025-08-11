@@ -9,8 +9,9 @@ import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.item.StickyHandItem;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
-import net.superkat.ziptoit.zipcast.ZipcastTarget;
-import net.superkat.ziptoit.zipcast.ZipcasterMovement;
+import net.superkat.ziptoit.zipcast.line.ZipcastLine;
+import net.superkat.ziptoit.zipcast.movement.ZipcastTarget;
+import net.superkat.ziptoit.zipcast.movement.ZipcasterMovement;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,6 +26,8 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     public boolean stickingToWall = false;
     @Unique
     public ZipcastTarget zipcastTarget;
+    @Unique
+    public ZipcastLine zipcastLine;
     @Unique
     public boolean noClipForZipcast = false;
     @Unique
@@ -96,6 +99,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Override
     public void ziptoit$startZipcast(ZipcastTarget zipcastTarget) {
         this.zipcastTarget = zipcastTarget;
+        this.zipcastLine = new ZipcastLine((PlayerEntity) (Object) this, 8);
         this.zipcasting = true;
         this.stickingToWall = false;
         this.zipcastTicks = 0;
@@ -109,6 +113,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     public void ziptoit$endZipcast() {
         this.zipcasting = false;
         this.zipcastTarget = null;
+        this.zipcastLine = null;
         this.noClipForZipcast = false;
     }
 
@@ -170,6 +175,16 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Override
     public void setZipcastTarget(ZipcastTarget zipcastTarget) {
         this.zipcastTarget = zipcastTarget;
+    }
+
+    @Override
+    public ZipcastLine getZipcastLine() {
+        return this.zipcastLine;
+    }
+
+    @Override
+    public void setZipcastLine(ZipcastLine zipcastLine) {
+        this.zipcastLine = zipcastLine;
     }
 
     @Override

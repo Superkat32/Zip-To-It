@@ -52,7 +52,7 @@ public class ZipToItRenderLayers {
 //                    .withFragmentShader("core/rendertype_leash")
 //                    .withSampler("Sampler2")
                     .withCull(false)
-                    .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_STRIP) // TRIANGLE STRIP VERY IMPORTANT!
+                    .withVertexFormat(VertexFormats.POSITION_COLOR_LIGHT, VertexFormat.DrawMode.TRIANGLE_STRIP) // TRIANGLE STRIP VERY IMPORTANT!
                     .build()
     );
 

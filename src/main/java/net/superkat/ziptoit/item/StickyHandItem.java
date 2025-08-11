@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 import net.superkat.ziptoit.ZipToIt;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
-import net.superkat.ziptoit.zipcast.ZipcastTarget;
+import net.superkat.ziptoit.zipcast.movement.ZipcastTarget;
 
 public class StickyHandItem extends Item {
 

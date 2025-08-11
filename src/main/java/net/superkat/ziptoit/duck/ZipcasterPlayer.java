@@ -2,7 +2,8 @@ package net.superkat.ziptoit.duck;
 
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.item.StickyHandItem;
-import net.superkat.ziptoit.zipcast.ZipcastTarget;
+import net.superkat.ziptoit.zipcast.line.ZipcastLine;
+import net.superkat.ziptoit.zipcast.movement.ZipcastTarget;
 
 public interface ZipcasterPlayer {
 
@@ -36,6 +37,10 @@ public interface ZipcasterPlayer {
     ZipcastTarget zipcastTarget();
 
     void setZipcastTarget(ZipcastTarget zipcastTarget);
+
+    ZipcastLine getZipcastLine();
+
+    void setZipcastLine(ZipcastLine zipcastLine);
 
     boolean noClipForZipcast();
 

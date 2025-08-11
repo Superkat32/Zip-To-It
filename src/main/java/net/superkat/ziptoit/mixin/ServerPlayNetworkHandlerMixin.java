@@ -19,7 +19,7 @@ public class ServerPlayNetworkHandlerMixin {
         boolean fakeTeleporting = false;
         ServerPlayNetworkHandler self = (ServerPlayNetworkHandler) (Object) this;
         if(self.player instanceof ZipcasterPlayer zipcasterPlayer) {
-            fakeTeleporting = zipcasterPlayer.isZipcasting() || zipcasterPlayer.isStickingToWall();
+            fakeTeleporting = zipcasterPlayer.isZipcasting() || zipcasterPlayer.isStickingToWall() || zipcasterPlayer.slowFallForZipcast();
         }
 
         return actuallyTeleporting || fakeTeleporting;

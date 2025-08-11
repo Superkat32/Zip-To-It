@@ -5,7 +5,7 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.superkat.ziptoit.ZipToIt;
-import net.superkat.ziptoit.zipcast.ZipcastTarget;
+import net.superkat.ziptoit.zipcast.movement.ZipcastTarget;
 
 public record ZipcastStartCommonPacket(ZipcastTarget zipcastTarget) implements CustomPayload {
     public static final Identifier ZIPCAST_START_ID = Identifier.of(ZipToIt.MOD_ID, "zipcast_start");

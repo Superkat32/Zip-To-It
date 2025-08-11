@@ -1,4 +1,4 @@
-package net.superkat.ziptoit.zipcast;
+package net.superkat.ziptoit.zipcast.movement;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.RegistryByteBuf;
