@@ -6,13 +6,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.consume.UseAction;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.superkat.ziptoit.ZipToIt;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
@@ -78,10 +76,6 @@ public class StickyHandItem extends Item {
 
         ZipcastTarget zipcastTarget = ZipcastTarget.ofRaycast(player, raycast);
         ZipcastManager.startZipcast(player, zipcastTarget, true);
-
-        // debug
-        Vec3d pos = raycast.getPos();
-        player.getWorld().addParticleClient(ParticleTypes.END_ROD, pos.getX(), pos.getY(), pos.getZ(), 0,0, 0);
     }
 
 

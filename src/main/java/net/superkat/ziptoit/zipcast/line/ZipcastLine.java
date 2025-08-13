@@ -50,8 +50,9 @@ public class ZipcastLine {
         boolean firstPerson = playerIsSelf && (MinecraftClient.getInstance().options.getPerspective().isFirstPerson());
 
         // Get player position, but also modify it for any adjustments for easier viewing experiences (e.g. in first person)
-        Vec3d handOffset = player.getHandPosOffset(player.getActiveItem().getItem()).multiply(firstPerson ? 0.5f : 1);
-        Vec3d playerPos = player.getPos().add(0, firstPerson ? 0 : 0.5, 0).subtract(handOffset);
+        float playerScale = player.getScale();
+        Vec3d handOffset = player.getHandPosOffset(player.getActiveItem().getItem()).multiply(firstPerson ? 0.5f : playerScale);
+        Vec3d playerPos = player.getPos().add(0, firstPerson ? 0 : 0.5f * playerScale, 0).subtract(handOffset);
         Vec3d zipcastTargetPos = zipcastTarget.pos();
         Vec3d targetPos = zipcastTargetPos;
         Vec3d difference = targetPos.subtract(playerPos);

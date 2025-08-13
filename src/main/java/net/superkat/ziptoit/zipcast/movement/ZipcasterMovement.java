@@ -4,15 +4,21 @@ import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
+import net.superkat.ziptoit.particle.ZipcastImpactEffect;
+import net.superkat.ziptoit.particle.ZipcastImpactSplatterEffect;
+import net.superkat.ziptoit.particle.ZipcastLandParticleEffect;
 import net.superkat.ziptoit.particle.ZipcastZoomParticleEffect;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
 import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 import net.superkat.ziptoit.zipcast.line.ZipcastLine;
 import net.superkat.ziptoit.zipcast.util.ZipcastClientHelper;
+import org.joml.Vector3f;
 
 public class ZipcasterMovement {
     public static void tickZipcasterPlayer(PlayerEntity player) {
@@ -43,10 +49,21 @@ public class ZipcasterMovement {
 
     public static void tickZipcasterPlayerAfterMovementApplied(PlayerEntity player) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+
         if(player.getWorld().isClient && zipcasterPlayer.isZipcasting() && zipcasterPlayer.getZipcastLine() != null) {
             spawnZoomParticles(player);
             ZipcastLine zipcastLine = zipcasterPlayer.getZipcastLine();
             zipcastLine.tickPoints();
+
+            ZipcastTarget zipcastTarget = zipcasterPlayer.zipcastTarget();
+
+            if(zipcasterPlayer.zipcastTicks() == zipcastTarget.startTicks()) {
+                Vec3d pos = zipcastTarget.pos();
+                Direction direction = zipcastTarget.raycastSide();
+                int color = zipcastTarget.color().color();
+                Vector3f color3f = ColorHelper.toVector(color);
+                player.getWorld().addParticleClient(new ZipcastLandParticleEffect(4, 0.5f, 4, 4, direction, color3f), true, true, pos.getX(), pos.getY(), pos.getZ(), 0, 0, 0);
+            }
         }
     }
 
@@ -123,6 +140,7 @@ public class ZipcasterMovement {
 
         if(end && player.getWorld().isClient) {
             player.playSound(SoundEvents.ITEM_MACE_SMASH_GROUND_HEAVY);
+            spawnImpactParticles(player);
             ZipcastManager.tryStickingToWall(player, zipcastTarget);
             if(player.isLogicalSideForUpdatingMovement()) {
                 player.setVelocity(Vec3d.ZERO);
@@ -220,6 +238,73 @@ public class ZipcasterMovement {
                 new ZipcastZoomParticleEffect(
                         zipcastColor, (float) Math.toDegrees(yaw), (float) Math.toDegrees(-pitch), stretch
                 ), force, force, x, y, z, velX, velY, velZ
+        );
+    }
+
+    public static void spawnImpactParticles(PlayerEntity player) {
+        if (!player.getWorld().isClient || !(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+
+        boolean force = ZipcastClientHelper.clientPlayerDistanceToPos(player.getPos()) <= 64;
+
+        ZipcastTarget zipcastTarget = zipcasterPlayer.zipcastTarget();
+        Direction direction = zipcastTarget.raycastSide();
+        Vec3d target = zipcastTarget.pos();
+
+        float offsetAmount = ZipcastClientHelper.mainPlayerFirstPerson(player) ? 3f : 1f;
+        float offsetX = offsetAmount * direction.getOffsetX();
+        float offsetY = offsetAmount * direction.getOffsetY();
+        float offsetZ = offsetAmount * direction.getOffsetZ();
+
+        float playerScale = player.getScale();
+        float x = (float) (target.getX() + offsetX);
+        float y = (float) (target.getY() + offsetY + (0.5f * playerScale));
+        float z = (float) (target.getZ() + offsetZ);
+
+        Vector3f color = ColorHelper.toVector(zipcastTarget.color().color());
+
+        // explosion particle
+        player.getWorld().addParticleClient(
+                new ZipcastImpactEffect(
+                        7, 3f * playerScale, color
+                ), force, force, x, y, z, 0, 0, 0
+        );
+
+        // sparkle (splatter) particles
+        for (int i = 0; i < 15; i++) {
+            impactSplatterParticle(player, force);
+        }
+    }
+
+    private static void impactSplatterParticle(PlayerEntity player, boolean force) {
+        if (!player.getWorld().isClient || !(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+
+        ZipcastTarget zipcastTarget = zipcasterPlayer.zipcastTarget();
+        ZipcastColor zipcastColor = zipcastTarget.color();
+        Direction direction = zipcastTarget.raycastSide();
+        Vec3d target = zipcastTarget.pos();
+
+        Random random = player.getWorld().random;
+        float velX = (float) (direction.getOffsetX() * random.nextFloat() + random.nextGaussian());
+        float velY = (float) (direction.getOffsetY() * random.nextFloat() + random.nextGaussian());
+        float velZ = (float) (direction.getOffsetZ() * random.nextFloat() + random.nextGaussian());
+
+        float offsetAmount = 0.5f;
+        float offsetX = offsetAmount * direction.getOffsetX();
+        float offsetY = offsetAmount * direction.getOffsetY();
+        float offsetZ = offsetAmount * direction.getOffsetZ();
+
+        float playerScale = player.getScale();
+        float x = (float) (target.getX() + offsetX);
+        float y = (float) (target.getY() + offsetY + (0.5f * playerScale));
+        float z = (float) (target.getZ() + offsetZ);
+
+        int age = random.nextBetween(15, 20);
+        float scale = random.nextFloat() * random.nextFloat() / 1.5f;
+        boolean altColor = random.nextInt(4) == 0;
+        Vector3f color = ColorHelper.toVector(altColor ? zipcastColor.altColor() : zipcastColor.color());
+
+        player.getWorld().addParticleClient(
+                new ZipcastImpactSplatterEffect(age, scale, color), force, force, x, y, z, velX, velY, velZ
         );
     }
 
