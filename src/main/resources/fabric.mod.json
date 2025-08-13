@@ -22,7 +22,7 @@
 			"net.superkat.ziptoit.ZipToItClient"
 		],
 		"fabric-datagen": [
-			"net.superkat.ziptoit.data.ZipToItDataGen"
+			"net.superkat.ziptoit.datagen.ZipToItDataGen"
 		]
 	},
 	"mixins": [

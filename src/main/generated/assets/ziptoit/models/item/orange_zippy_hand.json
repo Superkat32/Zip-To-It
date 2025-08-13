@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "ziptoit:item/orange_zippy_hand"
+  }
+}

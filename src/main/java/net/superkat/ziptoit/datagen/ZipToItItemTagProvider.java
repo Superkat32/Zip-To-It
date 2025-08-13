@@ -17,7 +17,21 @@ public class ZipToItItemTagProvider extends FabricTagProvider.ItemTagProvider {
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
         this.valueLookupBuilder(ZipToItItems.STICKY_HANDS).add(
                 ZipToItItems.RED_STICKY_HAND,
-                ZipToItItems.YELLOW_STICKY_HAND
+                ZipToItItems.ORANGE_STICKY_HAND,
+                ZipToItItems.YELLOW_STICKY_HAND,
+                ZipToItItems.LIME_STICKY_HAND,
+                ZipToItItems.GREEN_STICKY_HAND,
+                ZipToItItems.BLUE_STICKY_HAND,
+                ZipToItItems.CYAN_STICKY_HAND,
+                ZipToItItems.LIGHT_BLUE_STICKY_HAND,
+                ZipToItItems.PINK_STICKY_HAND,
+                ZipToItItems.MAGENTA_STICKY_HAND,
+                ZipToItItems.PURPLE_STICKY_HAND,
+                ZipToItItems.WHITE_STICKY_HAND,
+                ZipToItItems.LIGHT_GRAY_STICKY_HAND,
+                ZipToItItems.GRAY_STICKY_HAND,
+                ZipToItItems.BROWN_STICKY_HAND,
+                ZipToItItems.BLACK_STICKY_HAND
         );
     }
 }

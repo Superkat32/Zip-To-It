@@ -1,6 +1,20 @@
 {
   "values": [
     "ziptoit:red_zippy_hand",
-    "ziptoit:yellow_zippy_hand"
+    "ziptoit:orange_zippy_hand",
+    "ziptoit:yellow_zippy_hand",
+    "ziptoit:lime_zippy_hand",
+    "ziptoit:green_zippy_hand",
+    "ziptoit:blue_zippy_hand",
+    "ziptoit:cyan_zippy_hand",
+    "ziptoit:light_blue_zippy_hand",
+    "ziptoit:pink_zippy_hand",
+    "ziptoit:magenta_zippy_hand",
+    "ziptoit:purple_zippy_hand",
+    "ziptoit:white_zippy_hand",
+    "ziptoit:light_gray_zippy_hand",
+    "ziptoit:gray_zippy_hand",
+    "ziptoit:brown_zippy_hand",
+    "ziptoit:black_zippy_hand"
   ]
 }
