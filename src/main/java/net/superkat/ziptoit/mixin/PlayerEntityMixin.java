@@ -40,6 +40,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Unique
     public int ticksSinceLastZipcast = StickyHandItem.TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND;
 
+    // The main tick method where tick related numbers are increased, and stuff like slow falling is applied
     @Inject(method = "tick", at = @At(value = "HEAD"))
     public void ziptoit$tickZipcastPlayer(CallbackInfo ci) {
         PlayerEntity self = (PlayerEntity) (Object) this;
@@ -53,6 +54,14 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     public void ziptoit$tickZipcastPlayerForNoClip(CallbackInfo ci) {
         PlayerEntity self = (PlayerEntity) (Object) this;
         ZipcasterMovement.tickZipcasterPlayerForNoClip(self);
+    }
+
+    // Called at the tail instead of head to allow for the player movement to update, preventing issues with
+    // the zipcaster line lerping being one tick behind of the player movement lerping
+    @Inject(method = "tick", at = @At("TAIL"))
+    public void ziptoit$tickZipcastPlayerForPostMovementRender(CallbackInfo ci) {
+        PlayerEntity self = (PlayerEntity) (Object) this;
+        ZipcasterMovement.tickZipcasterPlayerAfterMovementApplied(self);
     }
 
     @WrapOperation(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;travel(Lnet/minecraft/util/math/Vec3d;)V"))

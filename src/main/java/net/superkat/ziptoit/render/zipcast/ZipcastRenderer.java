@@ -1,4 +1,4 @@
-package net.superkat.ziptoit.render;
+package net.superkat.ziptoit.render.zipcast;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
@@ -16,6 +16,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
+import net.superkat.ziptoit.render.ZipToItRenderLayers;
 import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 import net.superkat.ziptoit.zipcast.line.ZipcastLine;
 import net.superkat.ziptoit.zipcast.movement.ZipcastTarget;
@@ -50,7 +51,6 @@ public class ZipcastRenderer {
         ZipcastLine zipcastLine = zipcasterPlayer.getZipcastLine();
         List<ZipcastLine.ZipcastPoint> zipcastPoints = zipcastLine.points;
 
-//        List<ZipcastPoint> zipcastPoints = getZipcastPoints(player, 8, tickProgress);
         renderZipcastLine(matrices, consumers.getBuffer(ZipToItRenderLayers.ZIPCAST_LINE), zipcastPoints, 45f, tickProgress);
         renderZipcastLine(matrices, consumers.getBuffer(ZipToItRenderLayers.ZIPCAST_LINE), zipcastPoints, -45f, tickProgress);
         renderZipcastCube(matrices, consumers.getBuffer(ZipToItRenderLayers.RAYCAST_TARGET_BOX), camera, zipcastTarget, zipcastPoints.getLast().lerpPos(tickProgress));
@@ -66,7 +66,6 @@ public class ZipcastRenderer {
             Vec3d target = targetZipcastPoint.lerpPos(tickProgress);
             int color = zipcastPoint.lerpColor(tickProgress);
             int light = zipcastPoint.getLight();
-//            int light = getLight(pos, 7);
             renderLineSegment(matrices, consumer, pos, target, color, light, 0.15f, zipcastPoint.lerpOffset(tickProgress), rotation);
         }
     }

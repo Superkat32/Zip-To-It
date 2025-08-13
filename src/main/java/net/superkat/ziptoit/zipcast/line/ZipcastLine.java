@@ -6,7 +6,7 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
-import net.superkat.ziptoit.render.ZipcastRenderer;
+import net.superkat.ziptoit.render.zipcast.ZipcastRenderer;
 import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 import net.superkat.ziptoit.zipcast.movement.ZipcastTarget;
 
@@ -155,6 +155,12 @@ public class ZipcastLine {
             this.offset = offset;
             this.color = color;
             this.light = light;
+        }
+
+        public void updatePosFromLerpedPlayerPos(Vec3d pos) {
+//            this.prevPos = this.pos;
+            this.pos = pos;
+            this.prevPos = pos;
         }
 
         public Vec3d lerpPos(float tickProgress) {

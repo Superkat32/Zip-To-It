@@ -1,4 +1,4 @@
-package net.superkat.ziptoit.mixin;
+package net.superkat.ziptoit.mixin.render;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

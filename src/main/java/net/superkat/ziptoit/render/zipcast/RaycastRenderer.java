@@ -1,4 +1,4 @@
-package net.superkat.ziptoit.render;
+package net.superkat.ziptoit.render.zipcast;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
@@ -13,6 +13,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.item.StickyHandComponent;
 import net.superkat.ziptoit.item.ZipToItItems;
+import net.superkat.ziptoit.render.ZipToItRenderLayers;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
 import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 
