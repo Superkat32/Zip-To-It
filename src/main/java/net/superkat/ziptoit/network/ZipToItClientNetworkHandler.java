@@ -1,11 +1,13 @@
 package net.superkat.ziptoit.network;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
+import net.superkat.ziptoit.network.packets.AllowZipcastingZipcastS2CPacket;
 import net.superkat.ziptoit.network.packets.WallStickEndCommonPacket;
 import net.superkat.ziptoit.network.packets.WallStickStartCommonPacket;
 import net.superkat.ziptoit.network.packets.ZipcastCancelCommonPacket;
@@ -22,6 +24,8 @@ public class ZipToItClientNetworkHandler {
         ClientPlayNetworking.registerGlobalReceiver(WallStickStartCommonPacket.ID, ZipToItClientNetworkHandler::onWallStickStart);
         ClientPlayNetworking.registerGlobalReceiver(WallStickEndCommonPacket.ID, ZipToItClientNetworkHandler::onWallStickEnd);
         ClientPlayNetworking.registerGlobalReceiver(ZipcastCancelCommonPacket.ID, ZipToItClientNetworkHandler::onZipcastCancel);
+
+        ClientPlayNetworking.registerGlobalReceiver(AllowZipcastingZipcastS2CPacket.ID, ZipToItClientNetworkHandler::onZipcastDuringZipcastGameruleChange);
     }
 
     public static void onZipcastStart(ZipcastStartCommonPacket payload, ClientPlayNetworking.Context context) {
@@ -77,5 +81,12 @@ public class ZipToItClientNetworkHandler {
         ZipcastManager.cancelZipcast(player, hardCancel, false);
     }
 
+    public static void onZipcastDuringZipcastGameruleChange(AllowZipcastingZipcastS2CPacket payload, ClientPlayNetworking.Context context) {
+        ClientPlayerEntity player = context.player();
+        boolean allow = payload.allow();
+        if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+
+        zipcasterPlayer.setAllowZipcastDuringZipcast(allow);
+    }
 
 }

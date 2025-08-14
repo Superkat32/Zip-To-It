@@ -32,6 +32,9 @@ public class ZipToItRenderLayers {
     public static final RenderPipeline ZIPCAST_HAND_BOX_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
                     .withLocation(Identifier.of(ZipToIt.MOD_ID, "pipeline/zipcast_hand_box"))
+                    .withVertexShader("core/rendertype_leash")
+                    .withFragmentShader("core/rendertype_leash")
+                    .withSampler("Sampler2")
                     .withVertexFormat(VertexFormats.POSITION_COLOR_LIGHT, VertexFormat.DrawMode.TRIANGLE_STRIP)
                     .build()
     );
@@ -42,7 +45,7 @@ public class ZipToItRenderLayers {
             false,
             true,
             ZIPCAST_HAND_BOX_PIPELINE,
-            RenderLayer.MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false)
+            RenderLayer.MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).lightmap(RenderPhase.ENABLE_LIGHTMAP).build(false)
     );
 
     public static final RenderPipeline RAYCAST_LINE_PIPELINE = RenderPipelines.register(

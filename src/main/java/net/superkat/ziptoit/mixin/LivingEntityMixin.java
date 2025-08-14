@@ -13,4 +13,9 @@ public class LivingEntityMixin extends EntityMixin {
         return original;
     }
 
+    @ModifyReturnValue(method = "computeFallDamage", at = @At("RETURN"))
+    public int ziptoit$modifyFallDamageForZipcaster(int original) {
+        return original;
+    }
+
 }

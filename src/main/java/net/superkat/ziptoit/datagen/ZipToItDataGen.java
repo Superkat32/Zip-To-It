@@ -10,5 +10,6 @@ public class ZipToItDataGen implements DataGeneratorEntrypoint {
 
         pack.addProvider(ZipToItItemTagProvider::new);
         pack.addProvider(ZipToItItemModelProvider::new);
+        pack.addProvider(ZipToItRecipeProvider::new);
     }
 }

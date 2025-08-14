@@ -21,5 +21,20 @@
   "item.ziptoit.zippy_hand.main_color": "Main Color:",
   "item.ziptoit.zippy_hand.alt_color": "Alt. Color:",
   "item.ziptoit.zippy_hand.bright_color": "Bright Color:",
-  "item.ziptoit.zippy_hand.preview_color": "Preview Color:"
+  "item.ziptoit.zippy_hand.preview_color": "Preview Color:",
+
+  "death.fell.accident.zipcast.ground": "%1$s zipped too close to the ground",
+  "death.fell.accident.zipcast.zipcastic": "%1$s wasn't \"simply zipcastic\"",
+  "death.fell.accident.zipcast.undercover": "%1$s experienced what it's like to play Undercover Brella",
+  "death.fell.accident.zipcast.sun": "%1$s zipped too close to the sun",
+  "death.fell.accident.zipcast.soda": "%1$s forgot their Tacticooler soda",
+  "death.fell.accident.zipcast.sniped": "%1$s experienced what it's like to be sniped mid-air while Zipcasting - disappointment",
+  "death.fell.accident.zipcast.flounder": "%1$s was a floundering Zipcaster",
+  "death.fell.accident.zipcast.fell": "%1$s zipped and fell",
+  "death.fell.accident.zipcast.over": "%1$s discovered it's zip-mply over",
+  "death.fell.accident.zipcast.splat": "Zipcaster Splatted %1$s!",
+  "death.fell.accident.zipcast.notstolenfromterraria": "%1$s was ziiiiip, zipcastin'",
+  "death.fell.accident.zipcast.notstolenfromfreebird": "%1$s wasn't as free as a Zipcaster",
+  "death.fell.accident.zipcast.fall": "%1$s discovered fall damage still applies to Zipcasters",
+  "death.fell.accident.zipcast.splatted": "%1$s was splatted by Zipcaster using Ground"
 }

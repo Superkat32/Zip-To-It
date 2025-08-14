@@ -6,7 +6,8 @@
     "EntityMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",
-    "ServerPlayNetworkHandlerMixin"
+    "ServerPlayNetworkHandlerMixin",
+    "death.FallLocationMixin"
   ],
   "injectors": {
     "defaultRequire": 1

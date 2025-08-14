@@ -7,7 +7,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
@@ -51,9 +50,14 @@ public class ZipcastRenderer {
         ZipcastLine zipcastLine = zipcasterPlayer.getZipcastLine();
         List<ZipcastLine.ZipcastPoint> zipcastPoints = zipcastLine.points;
 
+        ZipcastLine.ZipcastPoint lastPoint = zipcastPoints.getLast();
+        // Use second to last point's light instead of last points,
+        // because it may sometimes be fully dark because it's inside the block
+        ZipcastLine.ZipcastPoint secondLastPoint = zipcastPoints.get(zipcastPoints.size() - 2);
+
         renderZipcastLine(matrices, consumers.getBuffer(ZipToItRenderLayers.ZIPCAST_LINE), zipcastPoints, 45f, tickProgress);
         renderZipcastLine(matrices, consumers.getBuffer(ZipToItRenderLayers.ZIPCAST_LINE), zipcastPoints, -45f, tickProgress);
-        renderZipcastCube(matrices, consumers.getBuffer(ZipToItRenderLayers.RAYCAST_TARGET_BOX), camera, zipcastTarget, zipcastPoints.getLast().lerpPos(tickProgress));
+        renderZipcastCube(matrices, consumers.getBuffer(ZipToItRenderLayers.ZIPCAST_HAND_BOX), camera, zipcastTarget, lastPoint.lerpPos(tickProgress), secondLastPoint.getLight());
 //        renderDebugZipcastLine(matrices, consumers.getBuffer(ZipToItRenderLayers.RAYCAST_TARGET_BOX), camera, zipcastPoints, zipcastTarget, tickProgress);
     }
 
@@ -70,12 +74,12 @@ public class ZipcastRenderer {
         }
     }
 
-    public static void renderZipcastCube(MatrixStack matrices, VertexConsumer consumer, Camera camera, ZipcastTarget zipcastTarget, Vec3d target) {
+    public static void renderZipcastCube(MatrixStack matrices, VertexConsumer consumer, Camera camera, ZipcastTarget zipcastTarget, Vec3d target, int light) {
         matrices.push();
         matrices.translate(-camera.getPos().x, -camera.getPos().y, -camera.getPos().z);
         ZipcastColor zipcastColor = zipcastTarget.color();
         int mainColor = zipcastColor.color();
-        int light = getLight(target, 3);
+//        int light = getLight(target, 3);
         drawCube(matrices, consumer, target, 0.4f, mainColor, light, 1f);
         matrices.pop();
     }
@@ -132,12 +136,60 @@ public class ZipcastRenderer {
         float red = ColorHelper.getRedFloat(color);
         float green = ColorHelper.getGreenFloat(color);
         float blue = ColorHelper.getBlueFloat(color);
-        VertexRendering.drawFilledBox(
+        drawFilledBox(
                 matrices, consumer,
-                pos.getX() - halfSize, pos.getY() - halfSize, pos.getZ() - halfSize,
-                pos.getX() + halfSize, pos.getY() + halfSize, pos.getZ() + halfSize,
-                red, green, blue, alpha
+                (float) (pos.getX() - halfSize), (float) (pos.getY() - halfSize), (float) (pos.getZ() - halfSize),
+                (float) (pos.getX() + halfSize), (float) (pos.getY() + halfSize), (float) (pos.getZ() + halfSize),
+                red, green, blue, alpha, light
         );
+    }
+
+    public static void drawFilledBox(
+            MatrixStack matrices,
+            VertexConsumer vertexConsumers,
+            float minX,
+            float minY,
+            float minZ,
+            float maxX,
+            float maxY,
+            float maxZ,
+            float red,
+            float green,
+            float blue,
+            float alpha,
+            int light
+    ) {
+        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
+        vertexConsumers.vertex(matrix4f, minX, minY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, minY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, minY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, minY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, maxY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, maxY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, maxY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, minY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, maxY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, minY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, minY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, minY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, maxY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, maxY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, maxY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, minY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, maxY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, minY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, minY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, minY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, minY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, minY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, minY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, maxY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, maxY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, minX, maxY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, maxY, minZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, maxY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, maxY, maxZ).color(red, green, blue, alpha).light(light);
+        vertexConsumers.vertex(matrix4f, maxX, maxY, maxZ).color(red, green, blue, alpha).light(light);
     }
 
     public static int getLight(Vec3d pos, int minLight) {

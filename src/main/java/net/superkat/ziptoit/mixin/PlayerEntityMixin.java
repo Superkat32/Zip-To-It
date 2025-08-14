@@ -39,6 +39,10 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
 
     @Unique
     public int ticksSinceLastZipcast = StickyHandItem.TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND;
+    @Unique
+    public boolean allowZipcastDuringZipcast = true;
+    @Unique
+    public boolean showZipcastDeathMessage = false;
 
     // The main tick method where tick related numbers are increased, and stuff like slow falling is applied
     @Inject(method = "tick", at = @At(value = "HEAD"))
@@ -106,6 +110,14 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     }
 
     @Override
+    public int ziptoit$modifyFallDamageForZipcaster(int original) {
+        if(this.isZipcasting() || this.isStickingToWall() || this.slowFallForZipcast()) {
+            return ZipcastManager.getFallDamageForZipcastPlayer((PlayerEntity) (Object) this, original);
+        }
+        return original;
+    }
+
+    @Override
     public void ziptoit$startZipcast(ZipcastTarget zipcastTarget) {
         this.zipcastTarget = zipcastTarget;
         this.zipcastLine = new ZipcastLine((PlayerEntity) (Object) this, 8);
@@ -114,6 +126,8 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         this.zipcastTicks = 0;
         this.wallTicks = 0;
         this.slowFallForZipcast = false;
+        this.ticksSinceLastZipcast = 0;
+        this.showZipcastDeathMessage = true;
 
         ZipcastManager.endWallStick((PlayerEntity) (Object) this, false, true);
     }
@@ -124,6 +138,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         this.zipcastTarget = null;
         this.zipcastLine = null;
         this.noClipForZipcast = false;
+        this.showZipcastDeathMessage = true;
     }
 
     @Override
@@ -131,11 +146,13 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         this.stickingToWall = true;
         this.wallTicks = 0;
         this.slowFallForZipcast = true;
+        this.showZipcastDeathMessage = true;
     }
 
     @Override
     public void ziptoit$endWallStick() {
         this.stickingToWall = false;
+        this.showZipcastDeathMessage = true;
     }
 
     @Override
@@ -148,12 +165,14 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         this.wallTicks = 0;
 
         this.slowFallForZipcast = true;
+        this.showZipcastDeathMessage = true;
     }
 
     @Override
     public void ziptoit$hardCancelZipcast() {
         this.ziptoit$softCancelZipcast();
         this.slowFallForZipcast = false;
+        this.showZipcastDeathMessage = false;
     }
 
     @Override
@@ -246,5 +265,25 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Override
     public void setTicksSinceZipcastActivate(int ticksSinceLastZipcast) {
         this.ticksSinceLastZipcast = ticksSinceLastZipcast;
+    }
+
+    @Override
+    public boolean allowZipcastDuringZipcast() {
+        return this.allowZipcastDuringZipcast;
+    }
+
+    @Override
+    public void setAllowZipcastDuringZipcast(boolean allow) {
+        this.allowZipcastDuringZipcast = allow;
+    }
+
+    @Override
+    public boolean showZipcastDeathMessage() {
+        return this.showZipcastDeathMessage;
+    }
+
+    @Override
+    public void setShowZipcastDeathMessage(boolean show) {
+        this.showZipcastDeathMessage = show;
     }
 }

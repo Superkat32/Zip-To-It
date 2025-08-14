@@ -78,4 +78,12 @@ public interface ZipcasterPlayer {
         return this.ticksSinceZipcastActivate() >= StickyHandItem.TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND;
     }
 
+    boolean showZipcastDeathMessage();
+
+    void setShowZipcastDeathMessage(boolean show);
+
+    boolean allowZipcastDuringZipcast();
+
+    void setAllowZipcastDuringZipcast(boolean allow);
+
 }

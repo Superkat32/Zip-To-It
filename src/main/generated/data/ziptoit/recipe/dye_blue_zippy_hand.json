@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_transmute",
+  "category": "misc",
+  "group": "sticky_hand_dye",
+  "input": "#ziptoit:sticky_hands",
+  "material": "minecraft:blue_dye",
+  "result": {
+    "id": "ziptoit:blue_zippy_hand"
+  }
+}

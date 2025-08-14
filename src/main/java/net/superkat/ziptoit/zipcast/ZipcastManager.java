@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
@@ -19,6 +20,7 @@ import net.superkat.ziptoit.network.packets.ZipcastCancelCommonPacket;
 import net.superkat.ziptoit.network.packets.ZipcastEndCommonPacket;
 import net.superkat.ziptoit.network.packets.ZipcastStartCommonPacket;
 import net.superkat.ziptoit.zipcast.movement.ZipcastTarget;
+import net.superkat.ziptoit.zipcast.movement.ZipcasterMovement;
 import net.superkat.ziptoit.zipcast.util.ZipcastClientHelper;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +44,9 @@ public class ZipcastManager {
 
     public static void endZipcast(LivingEntity player, boolean sendPackets) {
         if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+
+        player.playSound(SoundEvents.ITEM_MACE_SMASH_GROUND_HEAVY);
+        ZipcasterMovement.spawnImpactParticles((PlayerEntity) player);
         zipcasterPlayer.ziptoit$endZipcast();
 
         if(!sendPackets) return;
@@ -103,6 +108,7 @@ public class ZipcastManager {
     public static void cancelZipcast(LivingEntity player, boolean hardCancel, boolean sendPackets) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
+        player.playSound(SoundEvents.ITEM_TRIDENT_THUNDER.value(), 0.75f, 1f);
         zipcasterPlayer.ziptoit$softCancelZipcast();
         if(hardCancel) zipcasterPlayer.ziptoit$hardCancelZipcast();
 
@@ -164,6 +170,12 @@ public class ZipcastManager {
     public static double postZipcastSlowfallAmountForPlayer(PlayerEntity player, double original) {
         return Math.min(original, 0.0625);
 //        return 0.025;
+    }
+
+    public static int getFallDamageForZipcastPlayer(PlayerEntity player, int original) {
+        if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return original;
+        if(zipcasterPlayer.isZipcasting()) return 0;
+        return original - 12;
     }
 
 }

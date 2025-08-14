@@ -33,10 +33,13 @@ public class ZipcasterMovement {
             zipcasterPlayer.increaseWallTicks();
         }
 
-        if(zipcasterPlayer.slowFallForZipcast()) {
-            if(player.isOnGround()) {
-                zipcasterPlayer.setSlowFallForZipcast(false);
-            }
+        boolean onGround = player.isOnGround();
+        if(zipcasterPlayer.slowFallForZipcast() && onGround) {
+            zipcasterPlayer.setSlowFallForZipcast(false);
+        }
+
+        if(zipcasterPlayer.showZipcastDeathMessage() && onGround) {
+            zipcasterPlayer.setShowZipcastDeathMessage(false);
         }
     }
 
@@ -140,7 +143,7 @@ public class ZipcasterMovement {
 
         if(end && player.getWorld().isClient) {
             player.playSound(SoundEvents.ITEM_MACE_SMASH_GROUND_HEAVY);
-            spawnImpactParticles(player);
+            // TODO - Check allow zipcast during zipcast for on player death
             ZipcastManager.tryStickingToWall(player, zipcastTarget);
             if(player.isLogicalSideForUpdatingMovement()) {
                 player.setVelocity(Vec3d.ZERO);

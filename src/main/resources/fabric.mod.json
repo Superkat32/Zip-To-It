@@ -3,13 +3,12 @@
 	"id": "ziptoit",
 	"version": "${version}",
 	"name": "Zip To It",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Simply Zipcastic",
 	"authors": [
 		"Superkat32"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Superkat32/Zip-To-It"
 	},
 	"license": "MIT",
 	"icon": "assets/ziptoit/icon.png",
@@ -30,11 +29,8 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
-		"minecraft": "~1.21.8",
+		"minecraft": "1.21.8",
 		"java": ">=21",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }

@@ -1,6 +1,7 @@
 package net.superkat.ziptoit.network;
 
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.superkat.ziptoit.network.packets.AllowZipcastingZipcastS2CPacket;
 import net.superkat.ziptoit.network.packets.WallStickEndCommonPacket;
 import net.superkat.ziptoit.network.packets.WallStickStartCommonPacket;
 import net.superkat.ziptoit.network.packets.ZipcastCancelCommonPacket;
@@ -24,6 +25,8 @@ public class ZipToItPackets {
 
         PayloadTypeRegistry.playS2C().register(ZipcastCancelCommonPacket.ID, ZipcastCancelCommonPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(ZipcastCancelCommonPacket.ID, ZipcastCancelCommonPacket.CODEC);
+
+        PayloadTypeRegistry.playS2C().register(AllowZipcastingZipcastS2CPacket.ID, AllowZipcastingZipcastS2CPacket.CODEC);
     }
 
 }

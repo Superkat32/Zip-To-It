@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "sticky_hands_from_froglights",
+  "ingredients": [
+    "minecraft:lead",
+    "minecraft:slime_ball",
+    "minecraft:ochre_froglight"
+  ],
+  "result": {
+    "count": 1,
+    "id": "ziptoit:yellow_zippy_hand"
+  }
+}
