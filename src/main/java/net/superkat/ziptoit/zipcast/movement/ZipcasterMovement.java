@@ -23,6 +23,7 @@ import org.joml.Vector3f;
 public class ZipcasterMovement {
     public static void tickZipcasterPlayer(PlayerEntity player) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+//        if(!player.getWorld().getTickManager().shouldTick()) return;
         zipcasterPlayer.increaseLastZipcastActivateTicks();
 
         if(zipcasterPlayer.isZipcasting()) {
@@ -72,6 +73,7 @@ public class ZipcasterMovement {
 
     public static void travelZipcasting(PlayerEntity player, Vec3d movementInput) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+//        if(player.getWorld().getTickManager().isFrozen()) return;
 
         ZipcastTarget zipcastTarget = zipcasterPlayer.zipcastTarget();
         Vec3d zipcastPos = zipcastTarget.pos();
@@ -143,7 +145,6 @@ public class ZipcasterMovement {
 
         if(end && player.getWorld().isClient) {
             player.playSound(SoundEvents.ITEM_MACE_SMASH_GROUND_HEAVY);
-            // TODO - Check allow zipcast during zipcast for on player death
             ZipcastManager.tryStickingToWall(player, zipcastTarget);
             if(player.isLogicalSideForUpdatingMovement()) {
                 player.setVelocity(Vec3d.ZERO);

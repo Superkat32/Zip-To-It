@@ -162,6 +162,7 @@ public class ZipcastManager {
     public static boolean activateSwimmingPoseForZipcaster(PlayerEntity player) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return false;
         if(!zipcasterPlayer.isZipcasting()) return false;
+//        if(player.getWorld().getTickManager().isFrozen()) return false;
 
         return zipcasterPlayer.zipcastTicks() >= 3;
 //        return false;

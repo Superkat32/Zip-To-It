@@ -3,6 +3,7 @@ package net.superkat.ziptoit.zipcast.line;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -58,6 +59,8 @@ public class ZipcastLine {
         Item stickyHandItem = player.getActiveItem().getItem();
         // why was this so hard to fix
         if(player.getOffHandStack().isIn(ZipToItItems.STICKY_HANDS) && player.getMainHandStack().isIn(ZipToItItems.STICKY_HANDS)) {
+            handOffsetOffset = -1f;
+        } else if (player.getMainHandStack().isOf(Items.AIR) && player.getOffHandStack().isOf(Items.AIR)) {
             handOffsetOffset = -1f;
         }
 
