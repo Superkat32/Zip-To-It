@@ -4,6 +4,7 @@ import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -159,6 +160,10 @@ public class ZipcasterMovement {
         boolean jumping = player.isJumping();
         boolean end = player.isSneaking() || zipcasterPlayer.wallTicks() >= 1200 || jumping;
 
+        BlockPos wallStickPos = zipcasterPlayer.getWallStickPos();
+
+        if(player.getWorld().getBlockState(wallStickPos).isAir()) end = true;
+
         if(end) {
             ZipcastManager.endWallStick(player, jumping, true);
         } else {
@@ -251,6 +256,8 @@ public class ZipcasterMovement {
         boolean force = ZipcastClientHelper.clientPlayerDistanceToPos(player.getPos()) <= 64;
 
         ZipcastTarget zipcastTarget = zipcasterPlayer.zipcastTarget();
+        if(zipcastTarget == null) return;
+
         Direction direction = zipcastTarget.raycastSide();
         Vec3d target = zipcastTarget.pos();
 

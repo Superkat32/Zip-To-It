@@ -25,4 +25,6 @@ public class ServerPlayNetworkHandlerMixin {
         return actuallyTeleporting || fakeTeleporting;
     }
 
+    // https://github.com/ekulxam/rods_from_god/blob/081aea4c1a129acfd876077ccf3fee757fb77a40/src/main/java/survivalblock/rods_from_god/mixin/superbouncyslimeblock/ServerPlayNetworkHandlerMixin.java#L16
+
 }

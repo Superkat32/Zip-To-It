@@ -1,5 +1,6 @@
 package net.superkat.ziptoit.duck;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.item.StickyHandItem;
 import net.superkat.ziptoit.zipcast.line.ZipcastLine;
@@ -11,7 +12,7 @@ public interface ZipcasterPlayer {
 
     void ziptoit$endZipcast();
 
-    void ziptoit$stickToWall(Vec3d wallPos);
+    void ziptoit$stickToWall(Vec3d playerPos, BlockPos wallPos);
 
     void ziptoit$endWallStick();
 
@@ -33,6 +34,10 @@ public interface ZipcasterPlayer {
     boolean isStickingToWall();
 
     void setIsStickingToWall(boolean isStickingToWall);
+
+    BlockPos getWallStickPos();
+
+    void setWallStickPos(BlockPos blockPos);
 
     ZipcastTarget zipcastTarget();
 

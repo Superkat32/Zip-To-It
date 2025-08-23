@@ -29,6 +29,11 @@ public class ZipToItItems {
             builder -> builder.codec(StickyHandComponent.CODEC).packetCodec(StickyHandComponent.PACKET_CODEC).cache()
     );
 
+    public static final ComponentType<ZipsUsedComponent> ZIPS_USED_COMPONENT_TYPE = registerComponent(
+            "zips_used",
+            builder -> builder.codec(ZipsUsedComponent.CODEC).packetCodec(ZipsUsedComponent.PACKET_CODEC).cache()
+    );
+
     public static final Item RED_STICKY_HAND = registerStickyHand("red_zippy_hand", StickyHandColors.RED);
     public static final Item ORANGE_STICKY_HAND = registerStickyHand("orange_zippy_hand", StickyHandColors.ORANGE);
     public static final Item YELLOW_STICKY_HAND = registerStickyHand("yellow_zippy_hand", StickyHandColors.YELLOW);
@@ -72,13 +77,17 @@ public class ZipToItItems {
     private static void addStickyHandToItemGroup(FabricItemGroupEntries group, Item stickyHand) {
         ItemStack stickyHandStack = new ItemStack(stickyHand);
         stickyHandStack.set(ZipToItItems.STICKY_HAND_COMPONENT_TYPE, stickyHandStack.getDefaultComponents().get(STICKY_HAND_COMPONENT_TYPE));
+        stickyHandStack.set(ZipToItItems.ZIPS_USED_COMPONENT_TYPE, stickyHandStack.getDefaultComponents().get(ZIPS_USED_COMPONENT_TYPE));
         group.add(stickyHandStack);
     }
 
     private static Item registerStickyHand(String id, ZipcastColor color) {
         return registerItem(id,
                 StickyHandItem::new,
-                new Item.Settings().component(STICKY_HAND_COMPONENT_TYPE, new StickyHandComponent(48, 2.25f, color))
+                new Item.Settings()
+                        .component(STICKY_HAND_COMPONENT_TYPE, new StickyHandComponent(48, 2.25f, -1, color))
+                        .component(ZIPS_USED_COMPONENT_TYPE, new ZipsUsedComponent(0))
+                        .maxCount(1)
         );
     }
 

@@ -6,7 +6,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.hit.BlockHitResult;
@@ -49,7 +48,7 @@ public class RaycastRenderer {
         matrices.push();
         boolean firstPerson = client.options.getPerspective().isFirstPerson() && player == MinecraftClient.getInstance().player;
         float offsetAmount = firstPerson ? 1 : 0.05f;
-        float xOffset = getArmHoldingStickyHand(player) == Arm.RIGHT ? offsetAmount : -offsetAmount;
+        float xOffset = ZipcastManager.getArmHoldingStickyHand(player) == Arm.RIGHT ? offsetAmount : -offsetAmount;
         float yOffset = firstPerson ? 0.5f : 1f;
         renderSimpleLine(matrices, consumer.getBuffer(ZipToItRenderLayers.RAYCAST_LINE), playerPos.add(0, yOffset, 0), raycastPos, previewColor, 0.1f, xOffset);
         matrices.pop();
@@ -68,10 +67,6 @@ public class RaycastRenderer {
         float rotation = ((MinecraftClient.getInstance().player.getItemUseTime() + 10) % 100f) / 100f * 360f;
         ZipcastRenderer.renderLineSegment(matrixStack, consumer, origin, target, color, ZipcastRenderer.MAX_LIGHT, width, 0, rotation);
         ZipcastRenderer.renderLineSegment(matrixStack, consumer, target, origin, color, ZipcastRenderer.MAX_LIGHT, width, xOffset, rotation);
-    }
-
-    private static Arm getArmHoldingStickyHand(PlayerEntity player) {
-        return player.getMainHandStack().getItem().getDefaultStack().isIn(ZipToItItems.STICKY_HANDS) ? player.getMainArm() : player.getMainArm().getOpposite();
     }
 
 }

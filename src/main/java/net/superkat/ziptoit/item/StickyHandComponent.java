@@ -19,14 +19,15 @@ import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 
 import java.util.function.Consumer;
 
-public record StickyHandComponent(int zipRange, float zipSpeed, ZipcastColor zipcastColor) implements TooltipAppender {
-
-    public static final StickyHandComponent DEFAULT = new StickyHandComponent(48, 2.25f, StickyHandColors.YELLOW);
+public record StickyHandComponent(int zipRange, float zipSpeed, int maxZipUses, ZipcastColor zipcastColor) implements TooltipAppender {
+    public static final StickyHandComponent DEFAULT = new StickyHandComponent(48, 2.25f, -1, StickyHandColors.YELLOW);
+    public static final int INFINITE_ZIP_USES = -1;
 
     public static final Codec<StickyHandComponent> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     Codecs.POSITIVE_INT.optionalFieldOf("zip_range", 48).forGetter(StickyHandComponent::zipRange),
                     Codecs.POSITIVE_FLOAT.optionalFieldOf("zip_speed", 2.25f).forGetter(StickyHandComponent::zipSpeed),
+                    Codec.INT.optionalFieldOf("max_zips", INFINITE_ZIP_USES).forGetter(StickyHandComponent::maxZipUses),
                     ZipcastColor.CODEC.optionalFieldOf("zipcast_color", StickyHandColors.YELLOW).forGetter(StickyHandComponent::zipcastColor)
             ).apply(instance, StickyHandComponent::new)
     );
@@ -34,6 +35,7 @@ public record StickyHandComponent(int zipRange, float zipSpeed, ZipcastColor zip
     public static final PacketCodec<RegistryByteBuf, StickyHandComponent> PACKET_CODEC = PacketCodec.tuple(
             PacketCodecs.INTEGER, StickyHandComponent::zipRange,
             PacketCodecs.FLOAT, StickyHandComponent::zipSpeed,
+            PacketCodecs.INTEGER, StickyHandComponent::maxZipUses,
             ZipcastColor.PACKET_CODEC, StickyHandComponent::zipcastColor,
             StickyHandComponent::new
     );
@@ -51,6 +53,14 @@ public record StickyHandComponent(int zipRange, float zipSpeed, ZipcastColor zip
             textConsumer.accept(Text.translatable("item.ziptoit.zippy_hand.zipspeed")
                     .append(ScreenTexts.SPACE)
                     .append(String.valueOf(this.zipSpeed))
+                    .formatted(Formatting.GRAY));
+        }
+
+        if(this.maxZipUses != INFINITE_ZIP_USES) {
+            int zipsUsed = components.getOrDefault(ZipToItItems.ZIPS_USED_COMPONENT_TYPE, ZipsUsedComponent.DEFAULT).zipsUsed();
+            textConsumer.accept(Text.literal("Zips remaining:")
+                    .append(ScreenTexts.SPACE)
+                    .append(String.valueOf(this.maxZipUses - zipsUsed))
                     .formatted(Formatting.GRAY));
         }
 

@@ -2,8 +2,6 @@ package net.superkat.ziptoit.zipcast.line;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -55,16 +53,12 @@ public class ZipcastLine {
         // Get player position, but also modify it for any adjustments for easier viewing experiences (e.g. in first person)
         float playerScale = player.getScale();
 
-        float handOffsetOffset = 1f;
-        Item stickyHandItem = player.getActiveItem().getItem();
-        // why was this so hard to fix
-        if(player.getOffHandStack().isIn(ZipToItItems.STICKY_HANDS) && player.getMainHandStack().isIn(ZipToItItems.STICKY_HANDS)) {
-            handOffsetOffset = -1f;
-        } else if (player.getMainHandStack().isOf(Items.AIR) && player.getOffHandStack().isOf(Items.AIR)) {
-            handOffsetOffset = -1f;
+        float handOffsetOffset = -80f;
+        if(player.getOffHandStack().isIn(ZipToItItems.STICKY_HANDS) && !player.getMainHandStack().isIn(ZipToItItems.STICKY_HANDS)) {
+            handOffsetOffset = 80f;
         }
 
-        Vec3d handOffset = player.getHandPosOffset(stickyHandItem).multiply(firstPerson ? 0.5f : playerScale).multiply(handOffsetOffset);
+        Vec3d handOffset = player.getRotationVector(0f, player.getYaw() + handOffsetOffset).multiply(0.5f);
         Vec3d playerPos = player.getPos().add(0, firstPerson ? 0 : 0.5f * playerScale, 0).subtract(handOffset);
         Vec3d zipcastTargetPos = zipcastTarget.pos();
         Vec3d targetPos = zipcastTargetPos;

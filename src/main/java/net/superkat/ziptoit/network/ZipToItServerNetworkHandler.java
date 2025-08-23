@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.network.packets.WallStickEndCommonPacket;
@@ -49,11 +50,12 @@ public class ZipToItServerNetworkHandler {
         ServerWorld world = context.player().getWorld();
         int playerId = payload.playerId();
         Vec3d pos = payload.pos();
+        BlockPos wallPos = payload.wallPos();
 
         Entity entity = world.getEntityById(playerId);
         if(!(entity instanceof PlayerEntity player) || !(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
-        ZipcastManager.startWallStick(player, pos, true);
+        ZipcastManager.startWallStick(player, pos, wallPos, true);
     }
 
     public static void onWallStickEnd(WallStickEndCommonPacket payload, ServerPlayNetworking.Context context) {

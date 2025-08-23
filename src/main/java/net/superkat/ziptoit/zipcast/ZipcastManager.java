@@ -7,8 +7,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Arm;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
@@ -60,10 +62,10 @@ public class ZipcastManager {
         }
     }
 
-    public static void startWallStick(LivingEntity player, Vec3d pos, boolean sendPackets) {
+    public static void startWallStick(LivingEntity player, Vec3d pos, BlockPos wallPos, boolean sendPackets) {
         if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
-        zipcasterPlayer.ziptoit$stickToWall(pos);
+        zipcasterPlayer.ziptoit$stickToWall(pos, wallPos);
         if(player.getWorld().isClient) {
             player.setSneaking(true);
         }
@@ -72,11 +74,11 @@ public class ZipcastManager {
 
         if(!sendPackets) return;
         if(player.getWorld().isClient) {
-            ZipcastClientHelper.sendC2SPacket(new WallStickStartCommonPacket(player.getId(), pos));
+            ZipcastClientHelper.sendC2SPacket(new WallStickStartCommonPacket(player.getId(), pos, wallPos));
         } else {
             for (ServerPlayerEntity trackingPlayer : PlayerLookup.tracking(player)) {
                 if (trackingPlayer == player) continue;
-                ServerPlayNetworking.send(trackingPlayer, new WallStickStartCommonPacket(player.getId(), pos));
+                ServerPlayNetworking.send(trackingPlayer, new WallStickStartCommonPacket(player.getId(), pos, wallPos));
             }
         }
     }
@@ -126,9 +128,20 @@ public class ZipcastManager {
     // Assumed client side
     public static void tryStickingToWall(PlayerEntity player, ZipcastTarget zipcastTarget) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
-        if(!targetIsWallStickable(player, zipcastTarget)) return;
+        if(!targetIsWallStickable(player, zipcastTarget)) {
+            if(zipcastTarget.raycastSide() != Direction.UP) return;
+
+            // Not perfect, but should help a bunch
+            if(!player.getWorld().getBlockState(player.getBlockPos()).isAir()) {
+                player.setPosition(player.getPos().add(0, 0.5, 0));
+            }
+            return;
+        }
+
         Vec3d newPosition = zipcastTarget.pos().offset(zipcastTarget.raycastSide(), 0.5 * player.getScale());
-        startWallStick(player, newPosition, true);
+        // TODO - If this breaks too much, add the hit BlockPos from the initial raycast into the ZipcastTarget
+        BlockPos wallPos = BlockPos.ofFloored(zipcastTarget.pos().offset(zipcastTarget.raycastSide().getOpposite(), 0.3f));
+        startWallStick(player, newPosition, wallPos, true);
         player.setVelocity(Vec3d.ZERO);
     }
 
@@ -141,9 +154,14 @@ public class ZipcastManager {
 
         HitResult raycast = entity.raycast(zipRange, tickProgress, false);
         if(raycast.getType() == HitResult.Type.BLOCK) {
+            if(!entity.getWorld().getWorldBorder().contains(raycast.getPos())) return null;
             return (BlockHitResult) raycast;
         }
         return null;
+    }
+
+    public static Arm getArmHoldingStickyHand(PlayerEntity player) {
+        return player.getMainHandStack().getItem().getDefaultStack().isIn(ZipToItItems.STICKY_HANDS) ? player.getMainArm() : player.getMainArm().getOpposite();
     }
 
     public static boolean playerIsAimingZipcaster(PlayerEntity player) {

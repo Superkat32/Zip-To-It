@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.item.StickyHandItem;
@@ -24,6 +25,8 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     public boolean zipcasting = false;
     @Unique
     public boolean stickingToWall = false;
+    @Unique
+    public BlockPos wallStickPos = null;
     @Unique
     public ZipcastTarget zipcastTarget;
     @Unique
@@ -142,8 +145,9 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     }
 
     @Override
-    public void ziptoit$stickToWall(Vec3d wallPos) {
+    public void ziptoit$stickToWall(Vec3d playerPos, BlockPos wallPos) {
         this.stickingToWall = true;
+        this.wallStickPos = wallPos;
         this.wallTicks = 0;
         this.slowFallForZipcast = true;
         this.showZipcastDeathMessage = true;
@@ -153,6 +157,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     public void ziptoit$endWallStick() {
         this.stickingToWall = false;
         this.showZipcastDeathMessage = true;
+        this.wallStickPos = null;
     }
 
     @Override
@@ -160,6 +165,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         this.zipcastTarget = null;
         this.zipcasting = false;
         this.stickingToWall = false;
+        this.wallStickPos = null;
         this.noClipForZipcast = false;
         this.zipcastTicks = 0;
         this.wallTicks = 0;
@@ -193,6 +199,16 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Override
     public void setIsStickingToWall(boolean isStickingToWall) {
         this.stickingToWall = isStickingToWall;
+    }
+
+    @Override
+    public BlockPos getWallStickPos() {
+        return this.wallStickPos;
+    }
+
+    @Override
+    public void setWallStickPos(BlockPos blockPos) {
+        this.wallStickPos = blockPos;
     }
 
     @Override

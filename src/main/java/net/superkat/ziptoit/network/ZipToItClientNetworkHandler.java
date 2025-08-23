@@ -5,6 +5,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.network.packets.AllowZipcastingZipcastS2CPacket;
@@ -53,11 +54,12 @@ public class ZipToItClientNetworkHandler {
         ClientWorld world = context.player().clientWorld;
         int playerId = payload.playerId();
         Vec3d pos = payload.pos();
+        BlockPos wallPos = payload.wallPos();
 
         Entity entity = world.getEntityById(playerId);
         if(!(entity instanceof PlayerEntity player) || !(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
-        ZipcastManager.startWallStick(player, pos, false);
+        ZipcastManager.startWallStick(player, pos, wallPos, false);
     }
 
     public static void onWallStickEnd(WallStickEndCommonPacket payload, ClientPlayNetworking.Context context) {
