@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.world.GameRules;
+import net.superkat.ziptoit.compat.GooGunCompat;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.item.ZipToItItems;
 import net.superkat.ziptoit.network.ZipToItPackets;
@@ -40,6 +41,8 @@ public class ZipToIt implements ModInitializer {
 		ZipToItParticles.init();
 		ZipToItPackets.init();
 		ZipToItServerNetworkHandler.init();
+
+		GooGunCompat.init();
 
 //		ZipcasterEvents.ZIPCAST_START.register((player, zipcastTarget) -> {
 //			System.out.println("hi player");

@@ -5,6 +5,7 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -13,12 +14,13 @@ import net.superkat.ziptoit.item.StickyHandComponent;
 import net.superkat.ziptoit.item.ZipToItItems;
 import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 
-public record ZipcastTarget(int playerId, ZipcastColor color, Vec3d pos, Direction raycastSide, float speed, int startTicks, int lerpTicks, int buildupTicks) {
+public record ZipcastTarget(int playerId, ZipcastColor color, Vec3d pos, BlockPos blockPos, Direction raycastSide, float speed, int startTicks, int lerpTicks, int buildupTicks) {
 
     public static final PacketCodec<RegistryByteBuf, ZipcastTarget> PACKET_CODEC = PacketCodec.tuple(
             PacketCodecs.INTEGER, ZipcastTarget::playerId,
             ZipcastColor.PACKET_CODEC, ZipcastTarget::color,
             Vec3d.PACKET_CODEC, ZipcastTarget::pos,
+            BlockPos.PACKET_CODEC, ZipcastTarget::blockPos,
             Direction.PACKET_CODEC, ZipcastTarget::raycastSide,
             PacketCodecs.FLOAT, ZipcastTarget::speed,
             PacketCodecs.INTEGER, ZipcastTarget::startTicks,
@@ -28,10 +30,10 @@ public record ZipcastTarget(int playerId, ZipcastColor color, Vec3d pos, Directi
     );
 
     public static ZipcastTarget ofRaycast(LivingEntity player, BlockHitResult raycast) {
-        return ofPlayer(player, raycast.getPos(), raycast.getSide());
+        return ofPlayer(player, raycast.getPos(), raycast.getBlockPos(), raycast.getSide());
     }
 
-    public static ZipcastTarget ofPlayer(LivingEntity player, Vec3d pos, Direction raycastSide) {
+    public static ZipcastTarget ofPlayer(LivingEntity player, Vec3d pos, BlockPos blockPos, Direction raycastSide) {
         ZipcastColor color = player.getActiveItem().getOrDefault(ZipToItItems.STICKY_HAND_COMPONENT_TYPE, StickyHandComponent.DEFAULT).zipcastColor();
 
         float speed = player.getActiveItem().getOrDefault(ZipToItItems.STICKY_HAND_COMPONENT_TYPE, StickyHandComponent.DEFAULT).zipSpeed();
@@ -43,7 +45,7 @@ public record ZipcastTarget(int playerId, ZipcastColor color, Vec3d pos, Directi
         int minBuildupTicks = Math.max(startTicks, 12);
         int buildUpTicks = (int) MathHelper.clamp(startTicks + (distanceToPos / 10) + (velocitySquared * 5), minBuildupTicks, 22);
         int lerpTicks = MathHelper.clamp(buildUpTicks - 8, 4, 12);
-        return new ZipcastTarget(player.getId(), color, pos, raycastSide, speed, startTicks, lerpTicks, buildUpTicks);
+        return new ZipcastTarget(player.getId(), color, pos, blockPos, raycastSide, speed, startTicks, lerpTicks, buildUpTicks);
     }
 
 }

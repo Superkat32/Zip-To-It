@@ -170,9 +170,10 @@ public class ZipcastManager {
         }
 
         Vec3d newPosition = zipcastTarget.pos().offset(zipcastTarget.raycastSide(), 0.5 * player.getScale());
-        // TODO - If this breaks too much, add the hit BlockPos from the initial raycast into the ZipcastTarget
-        BlockPos wallPos = BlockPos.ofFloored(zipcastTarget.pos().offset(zipcastTarget.raycastSide().getOpposite(), 0.3f));
-        startWallStick(player, newPosition, wallPos, true);
+
+        if(!ZipcasterEvents.ALLOW_WALL_STICK.invoker().allowWallStick(player, zipcastTarget, newPosition, zipcastTarget.blockPos())) return;
+
+        startWallStick(player, newPosition, zipcastTarget.blockPos(), true);
         player.setVelocity(Vec3d.ZERO);
     }
 

@@ -37,6 +37,8 @@ dependencies {
 
 	// Camera Utils - Helpful for ensure rendering is correct from different camera angles
 	modImplementation("maven.modrinth:camera-utils:${project.camera_utils_version}")
+
+	modImplementation("maven.modrinth:googun:${project.googun_version}")
 }
 
 processResources {

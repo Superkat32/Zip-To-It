@@ -2,6 +2,7 @@ package net.superkat.ziptoit.api;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
  * The order of events are as follows:
  * <ul>
  *     <li>{@link ZipcasterEvents#ZIPCAST_START} - Player used Zippy Sticky Hand.</li>
+ *     <li>{@link ZipcasterEvents#ALLOW_WALL_STICK} - Client-side event to check if a player can stick to a specific wall - allows you to cancel it.</li>
  *     <li>{@link ZipcasterEvents#WALL_STICK_START} - Player successfully stuck to a wall.</li>
  *     <li>{@link ZipcasterEvents#ZIPCAST_END} - Player either stuck to wall, hit the ground or ceiling, or cancelled their Zipcast.</li>
  *     <li>{@link ZipcasterEvents#WALL_STICK_END} - Player either jumped or sneaked off a wall, or zipped to another location.</li>
@@ -28,6 +30,20 @@ public class ZipcasterEvents {
         for (ZipcastStart callback : callbacks) {
             callback.onZipcastStart(player, zipcastTarget);
         }
+    });
+
+    /**
+     * Called <b>ON THE CLIENT</b> when a player attempts to stick to a wall.<br><br>
+     * This is called AFTER the normal wall sticking check has been preformed and passed.
+     */
+    public static final Event<AllowWallStick> ALLOW_WALL_STICK = EventFactory.createArrayBacked(AllowWallStick.class, callbacks -> (player, zipcastTarget, playerTeleportPos, wallBlockPos) -> {
+        for (AllowWallStick callback : callbacks) {
+            if(!callback.allowWallStick(player, zipcastTarget, playerTeleportPos, wallBlockPos)) {
+                return false;
+            }
+        }
+
+        return true;
     });
 
     /**
@@ -70,20 +86,6 @@ public class ZipcasterEvents {
         void onZipcastStart(ServerPlayerEntity player, ZipcastTarget zipcastTarget);
     }
 
-    //    /**
-//     * Called when a player attempts to stick to a wall.<br><br>
-//     * This is called AFTER the normal wall sticking check has been preformed and passed.
-//     */
-//    public static final Event<AllowWallStick> ALLOW_WALL_STICK = EventFactory.createArrayBacked(AllowWallStick.class, callbacks -> (player,  playerTeleportPos, wallBlockPos) -> {
-//        for (AllowWallStick callback : callbacks) {
-//            if(!callback.allowWallStick(player, playerTeleportPos, wallBlockPos)) {
-//                return false;
-//            }
-//        }
-//
-//        return true;
-//    });
-
     @FunctionalInterface
     public interface ZipcastEnd {
         /**
@@ -92,6 +94,18 @@ public class ZipcasterEvents {
          * @param wasCancelled If the Zipcast was cancelled, most likely from the player sneaking while zipcasting.
          */
         void onZipcastEnd(ServerPlayerEntity player, @Nullable ZipcastTarget zipcastTarget, boolean wasCancelled);
+    }
+
+    @FunctionalInterface
+    public interface AllowWallStick {
+        /**
+         * @param player The <b>CLIENT PLAYER</b> who used the Zipcaster.
+         * @param zipcastTarget The ZipcastTarget of the player, which contains zip location, speed, and ZipcastColor object.
+         * @param playerTeleportPos The position the player will be teleported to if they successfully stick to the wall. This is normally a little bit in front of the wall position, based on the player's scale.
+         * @param wallBlockPos The BlockPos of the wall the player is trying to stick to.
+         * @return If the player is allowed to stick to the wall.
+         */
+        boolean allowWallStick(PlayerEntity player, ZipcastTarget zipcastTarget, Vec3d playerTeleportPos, BlockPos wallBlockPos);
     }
 
     @FunctionalInterface
@@ -113,16 +127,5 @@ public class ZipcasterEvents {
          */
         void onWallStickEnd(ServerPlayerEntity player, BlockPos wallBlockPos, boolean jumped);
     }
-
-    //    @FunctionalInterface
-//    public interface AllowWallStick {
-//        /**
-//         * @param player The player who used the Zipcaster.
-//         * @param playerTeleportPos The position the player will be teleported to if they successfully stick to the wall. This is normally a little bit in front of the wall position, based on the player's scale.
-//         * @param wallBlockPos The BlockPos of the wall the player is trying to stick to.
-//         * @return If the player is allowed to stick to the wall.
-//         */
-//        boolean allowWallStick(ServerPlayerEntity player, Vec3d playerTeleportPos, BlockPos wallBlockPos);
-//    }
 
 }

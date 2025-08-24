@@ -146,10 +146,10 @@ public class ZipcasterMovement {
 
         if(end && player.getWorld().isClient) {
             player.playSound(SoundEvents.ITEM_MACE_SMASH_GROUND_HEAVY);
-            ZipcastManager.tryStickingToWall(player, zipcastTarget);
             if(player.isLogicalSideForUpdatingMovement()) {
                 player.setVelocity(Vec3d.ZERO);
             }
+            ZipcastManager.tryStickingToWall(player, zipcastTarget);
             ZipcastManager.endZipcast(player, true);
         }
     }
