@@ -14,7 +14,7 @@ By default, Zippy Sticky hands can zip up to 48 blocks away from your current po
 Zippy Sticky Hands can be crafted by combining:
 - A slime ball
 - A lead
-- Any froglight
+- Any froglight  
 Depending on the froglight you use, you'll get a different color Zippy Sticky Hand. From there, you can use any colored Zippy Sticky Hand and a dye to change its color.
 
 ## Gamerules
