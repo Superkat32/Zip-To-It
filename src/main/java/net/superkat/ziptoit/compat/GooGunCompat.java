@@ -15,6 +15,7 @@ public class GooGunCompat {
             if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return true;
             World world = player.getWorld();
 
+            // Push player backwards of the bouncy goo block based their speed
             if(world.getBlockState(wallBlockPos).isOf(ModBlocks.BOUNCY_GOO)) {
                 float zipcastDelta = (float) zipcasterPlayer.zipcastTicks() / (zipcastTarget.startTicks() + zipcastTarget.buildupTicks());
                 if(zipcastDelta > 1f) zipcastDelta = 1f;
@@ -24,6 +25,7 @@ public class GooGunCompat {
                 return false;
             }
 
+            // Push player upwards based on their speed
             if (world.getBlockState(wallBlockPos).isOf(ModBlocks.SPEEDY_GOO)) {
                 float zipcastDelta = (float) zipcasterPlayer.zipcastTicks() / (zipcastTarget.startTicks() + zipcastTarget.buildupTicks());
                 if(zipcastDelta > 1f) zipcastDelta = 1f;
@@ -33,6 +35,7 @@ public class GooGunCompat {
                 return false;
             }
 
+            // Don't do anything, allow player to catch onto the sticky goo themselves
 //            if(world.getBlockState(wallBlockPos).isOf(ModBlocks.STICKY_GOO)) {
 //                return false;
 //            }
