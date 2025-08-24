@@ -58,7 +58,7 @@ public record StickyHandComponent(int zipRange, float zipSpeed, int maxZipUses, 
 
         if(this.maxZipUses != INFINITE_ZIP_USES) {
             int zipsUsed = components.getOrDefault(ZipToItItems.ZIPS_USED_COMPONENT_TYPE, ZipsUsedComponent.DEFAULT).zipsUsed();
-            textConsumer.accept(Text.literal("Zips remaining:")
+            textConsumer.accept(Text.translatable("item.ziptoit.zippy_hand.zipuses")
                     .append(ScreenTexts.SPACE)
                     .append(String.valueOf(this.maxZipUses - zipsUsed))
                     .formatted(Formatting.GRAY));

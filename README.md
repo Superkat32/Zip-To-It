@@ -90,6 +90,43 @@ Custom Colors Example with:
 Notes: 
 - Don't forget the extra "{}" brackets for the field value!
 - Vector3fs or integers(in theory) can be used to define the colors. A Vector3f can be defined using `[<0f-1f>, <0f-1f>, <0f,1f>]`
+- Custom colors will be displayed in the Zippy Sticky Hand's tooltip!
 
-The actual Zippy Sticky Hand item doesn't affect the colors, as they all default to yellow unless grabbed from the creative inventory. The colors for each Zippy Sticky Hand can be found from the code in `ziptoit/zipcast/color/StickyHandColors.class` - Good luck!
+The actual Zippy Sticky Hand item doesn't affect the colors, as they all default to yellow unless grabbed from the creative inventory.
 
+Here is a list of all the default colors, either as integers for shorter copy pasting, or as Vector3f's for easier modifying. It surprisingly only took me an hour to get this list.
+##### Defaults (Integers)
+Red: `/give @s ziptoit:red_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-1376244, "altColor":-262031, "brightColor":-9253, "previewColor":-65536}}]`  
+Orange: `/give @s ziptoit:orange_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-20215, "altColor":-233216, "brightColor":-5167, "previewColor":-26624}}]`  
+Yellow: `/give @s ziptoit:yellow_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-334764, "altColor":-154561, "brightColor":-198700, "previewColor":-256}}]`  
+Lime: `/give @s ziptoit:lime_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-8259541, "altColor":-11929540, "brightColor":-1638444, "previewColor":-6750464}}]`  
+Green: `/give @s ziptoit:green_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-13895610, "altColor":-12781464, "brightColor":-2818082, "previewColor":-16711936}}]`  
+Blue: `/give @s ziptoit:blue_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-13925128, "altColor":-16750081, "brightColor":-2496260, "previewColor":-16776961}}]`  
+Cyan: `/give @s ziptoit:cyan_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-12255233, "altColor":-12517403, "brightColor":-2491141, "previewColor":-16711681}}]`  
+Light blue: `/give @s ziptoit:light_blue_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-6686977, "altColor":-9905921, "brightColor":-2494468, "previewColor":-9110785}}]`  
+Pink: `/give @s ziptoit:pink_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-24321, "altColor":-820486, "brightColor":-596481, "previewColor":-35597}}]`  
+Magenta: `/give @s ziptoit:magenta_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-46873, "altColor":-56640, "brightColor":-213272, "previewColor":-49423}}]`  
+Purple: `/give @s ziptoit:purple_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-6994433, "altColor":-9231617, "brightColor":-1122305, "previewColor":-6815489}}]`  
+White: `/give @s ziptoit:white_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-267268, "altColor":-1647641, "brightColor":-143361, "previewColor":-1}}]`  
+Light gray: `/give @s ziptoit:light_gray_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-1380369, "altColor":-6117465, "brightColor":-2424833, "previewColor":-3552823}}]`  
+Gray: `/give @s ziptoit:gray_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-1380369, "altColor":-6117465, "brightColor":-2424833, "previewColor":-3552823}}]`  
+Brown: `/give @s ziptoit:brown_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-10401733, "altColor":-10141659, "brightColor":-4943749, "previewColor":-13232895}}]`  
+Black: `/give @s ziptoit:black_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-14606039, "altColor":-15921903, "brightColor":-10790022, "previewColor":-16777216}}]`  
+
+##### Defaults (Vector3f's)
+Red: `/give @s ziptoit:red_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.92156863, 0.0, 0.047058824], "altColor":[0.9882353, 0.0, 0.44313726], "brightColor":[1.0, 0.85882354, 0.85882354], "previewColor":[1.0, 0.0, 0.0]}}]`  
+Orange: `/give @s ziptoit:orange_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[1.0, 0.69411767, 0.03529412], "altColor":[0.9882353, 0.44313726, 0.0], "brightColor":[1.0, 0.92156863, 0.81960785], "previewColor":[1.0, 0.59607846, 0.0]}}]`  
+Yellow: `/give @s ziptoit:yellow_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.98039216, 0.89411765, 0.32941177], "altColor":[0.99215686, 0.6431373, 0.24705882], "brightColor":[0.9882353, 0.96862745, 0.83137256], "previewColor":[1.0, 1.0, 0.0]}}]`  
+Lime: `/give @s ziptoit:lime_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.5058824, 0.972549, 0.16862746], "altColor":[0.28627452, 0.972549, 0.23529412], "brightColor":[0.9019608, 1.0, 0.83137256], "previewColor":[0.59607846, 1.0, 0.0]}}]`  
+Green: `/give @s ziptoit:green_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.16862746, 0.972549, 0.27450982], "altColor":[0.23529412, 0.972549, 0.40784314], "brightColor":[0.83137256, 1.0, 0.87058824], "previewColor":[0.0, 1.0, 0.0]}}]`  
+Blue: `/give @s ziptoit:blue_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.16862746, 0.5176471, 0.972549], "altColor":[0.0, 0.4117647, 1.0], "brightColor":[0.8509804, 0.9098039, 0.9882353], "previewColor":[0.0, 0.0, 1.0]}}]`  
+Cyan: `/give @s ziptoit:cyan_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.26666668, 1.0, 1.0], "altColor":[0.2509804, 1.0, 0.8980392], "brightColor":[0.8509804, 0.9882353, 0.9843137], "previewColor":[0.0, 1.0, 1.0]}}]`  
+Light blue: `/give @s ziptoit:light_blue_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.6, 0.9647059, 1.0], "altColor":[0.40784314, 0.84705883, 1.0], "brightColor":[0.8509804, 0.9372549, 0.9882353], "previewColor":[0.45490196, 0.98039216, 1.0]}}]`  
+Pink: `/give @s ziptoit:pink_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[1.0, 0.627451, 1.0], "altColor":[0.9529412, 0.47843137, 0.98039216], "brightColor":[0.9647059, 0.8980392, 1.0], "previewColor":[1.0, 0.45490196, 0.9529412]}}]`  
+Magenta: `/give @s ziptoit:magenta_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[1.0, 0.28235295, 0.90588236], "altColor":[1.0, 0.13333334, 0.7529412], "brightColor":[0.9882353, 0.74509805, 0.9098039], "previewColor":[1.0, 0.24313726, 0.94509804]}}]`  
+Purple: `/give @s ziptoit:purple_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.58431375, 0.27058825, 1.0], "altColor":[0.4509804, 0.13333334, 1.0], "brightColor":[0.93333334, 0.8745098, 1.0], "previewColor":[0.59607846, 0.0, 1.0]}}]`  
+White: `/give @s ziptoit:white_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.9843137, 0.92156863, 0.9882353], "altColor":[0.9019608, 0.85882354, 0.90588236], "brightColor":[0.99215686, 0.8117647, 1.0], "previewColor":[1.0, 1.0, 1.0]}}]`  
+Light gray: `/give @s ziptoit:light_gray_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.91764706, 0.9372549, 0.9372549], "altColor":[0.63529414, 0.654902, 0.654902], "brightColor":[0.85490197, 1.0, 1.0], "previewColor":[0.7882353, 0.7882353, 0.7882353]}}]`  
+Gray: `/give @s ziptoit:gray_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.91764706, 0.9372549, 0.9372549], "altColor":[0.63529414, 0.654902, 0.654902], "brightColor":[0.85490197, 1.0, 1.0], "previewColor":[0.7882353, 0.7882353, 0.7882353]}}]`  
+Brown: `/give @s ziptoit:brown_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.38039216, 0.28235295, 0.23137255], "altColor":[0.39607844, 0.2509804, 0.14509805], "brightColor":[0.7058824, 0.5647059, 0.48235294], "previewColor":[0.21176471, 0.08235294, 0.003921569]}}]`  
+Black: `/give @s ziptoit:black_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.12941177, 0.12941177, 0.16078432], "altColor":[0.050980393, 0.050980393, 0.06666667], "brightColor":[0.35686275, 0.35686275, 0.47843137], "previewColor":[0.0, 0.0, 0.0]}}]`

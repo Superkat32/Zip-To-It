@@ -53,16 +53,7 @@ public class StickyHandItem extends Item {
     @Override
     public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
         zipcastPlayer(user, stack);
-
-        if(!stickyHandCanBeUsedInfinitely(stack) && (user instanceof ServerPlayerEntity playerEntity)) {
-            int zipsUsed = getZipsUsed(stack) + 1;
-            setZipsUsed(stack, zipsUsed);
-            if(zipsUsed >= getMaxZips(stack)) {
-                playerEntity.playSoundToPlayer(SoundEvents.ENTITY_BREEZE_DEATH, SoundCategory.PLAYERS, 1f, 1f);
-                playerEntity.playSoundToPlayer(SoundEvents.ENTITY_BREEZE_DEFLECT, SoundCategory.PLAYERS, 1f, 1f);
-                stack.decrement(1);
-            }
-        }
+        damageStickyHand(user, stack);
 
         if(stack.getComponents().contains(DataComponentTypes.USE_COOLDOWN)) {
             stack.get(DataComponentTypes.USE_COOLDOWN).set(stack, user);
@@ -87,6 +78,19 @@ public class StickyHandItem extends Item {
 
         ZipcastTarget zipcastTarget = ZipcastTarget.ofRaycast(player, raycast);
         ZipcastManager.startZipcast(player, zipcastTarget, true);
+    }
+
+    public void damageStickyHand(LivingEntity entity, ItemStack stack) {
+        if(!(entity instanceof ServerPlayerEntity player)) return;
+        if(stickyHandCanBeUsedInfinitely(stack)) return;
+
+        int zipsUsed = getZipsUsed(stack) + 1;
+        setZipsUsed(stack, zipsUsed);
+        if(zipsUsed >= getMaxZips(stack)) {
+            player.playSoundToPlayer(SoundEvents.ENTITY_BREEZE_DEATH, SoundCategory.PLAYERS, 1f, 1f);
+            player.playSoundToPlayer(SoundEvents.ENTITY_BREEZE_DEFLECT, SoundCategory.PLAYERS, 1f, 1f);
+            stack.decrement(1);
+        }
     }
 
     @Override

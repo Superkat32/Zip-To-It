@@ -41,6 +41,27 @@ public class ZipToIt implements ModInitializer {
 		ZipToItPackets.init();
 		ZipToItServerNetworkHandler.init();
 
+//		ZipcasterEvents.ZIPCAST_START.register((player, zipcastTarget) -> {
+//			System.out.println("hi player");
+//		});
+//
+//		ZipcasterEvents.ZIPCAST_END.register((player, zipcastTarget, wasCancelled) -> {
+//			System.out.println("bye player - " + wasCancelled);
+//		});
+//
+//		ZipcasterEvents.WALL_STICK_START.register((player, playerTeleportPos, wallBlockPos) -> {
+//			System.out.println("what's up player");
+//			for (BlockPos pos : BlockPos.iterate(player.getBoundingBox().expand(3))) {
+//				if(player.getWorld().getBlockState(pos).isOf(Blocks.JUNGLE_PLANKS)) {
+//					player.getWorld().breakBlock(pos, false, player);
+//				}
+//			}
+//		});
+//
+//		ZipcasterEvents.WALL_STICK_END.register((player, wallBlockPos, jumped) -> {
+//			System.out.println("cya player - " + jumped);
+//		});
+
 		ServerPlayerEvents.JOIN.register(serverPlayerEntity -> {
 			if(serverPlayerEntity instanceof ZipcasterPlayer) {
 				ZipcastManager.endZipcast(serverPlayerEntity, true);

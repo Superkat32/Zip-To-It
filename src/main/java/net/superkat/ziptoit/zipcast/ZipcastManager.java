@@ -13,6 +13,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.superkat.ziptoit.api.ZipcasterEvents;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.item.StickyHandComponent;
 import net.superkat.ziptoit.item.ZipToItItems;
@@ -33,6 +34,15 @@ public class ZipcastManager {
 
         zipcasterPlayer.ziptoit$startZipcast(zipcastTarget);
 
+        if(player instanceof ServerPlayerEntity serverPlayer) {
+//            ItemStack stack = serverPlayer.getActiveItem();
+//            if(stack.getItem() instanceof StickyHandItem stickyHandItem) {
+//                stickyHandItem.damageStickyHand(player, stack);
+//            }
+
+            ZipcasterEvents.ZIPCAST_START.invoker().onZipcastStart(serverPlayer, zipcastTarget);
+        }
+
         if(!sendPackets) return;
         if(player.getWorld().isClient) {
             ZipcastClientHelper.sendC2SPacket(new ZipcastStartCommonPacket(zipcastTarget));
@@ -49,6 +59,12 @@ public class ZipcastManager {
 
         player.playSound(SoundEvents.ITEM_MACE_SMASH_GROUND_HEAVY);
         ZipcasterMovement.spawnImpactParticles((PlayerEntity) player);
+
+        // Call event before endZipcast to keep zipcastTarget
+        if(zipcasterPlayer.isZipcasting() && player instanceof ServerPlayerEntity playerEntity) {
+            ZipcasterEvents.ZIPCAST_END.invoker().onZipcastEnd(playerEntity, zipcasterPlayer.zipcastTarget(), false);
+        }
+
         zipcasterPlayer.ziptoit$endZipcast();
 
         if(!sendPackets) return;
@@ -72,6 +88,10 @@ public class ZipcastManager {
         player.setNoGravity(true);
         player.setPosition(pos);
 
+        if(player instanceof ServerPlayerEntity playerEntity) {
+            ZipcasterEvents.WALL_STICK_START.invoker().onWallStickStart(playerEntity, pos, wallPos);
+        }
+
         if(!sendPackets) return;
         if(player.getWorld().isClient) {
             ZipcastClientHelper.sendC2SPacket(new WallStickStartCommonPacket(player.getId(), pos, wallPos));
@@ -86,7 +106,14 @@ public class ZipcastManager {
     public static void endWallStick(LivingEntity player, boolean jump, boolean sendPackets) {
         if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
+        // get wall stick pos before making it null
+        BlockPos wallPos = zipcasterPlayer.getWallStickPos();
+        boolean wasStickingToWall = zipcasterPlayer.isStickingToWall();
         zipcasterPlayer.ziptoit$endWallStick();
+
+        if(wasStickingToWall && player instanceof ServerPlayerEntity playerEntity) {
+            ZipcasterEvents.WALL_STICK_END.invoker().onWallStickEnd(playerEntity, wallPos, jump);
+        }
 
         if (jump && player.isLogicalSideForUpdatingMovement()) {
             player.setVelocity(0, 0.7f, 0);
@@ -113,6 +140,10 @@ public class ZipcastManager {
         player.playSound(SoundEvents.ITEM_TRIDENT_THUNDER.value(), 0.75f, 1f);
         zipcasterPlayer.ziptoit$softCancelZipcast();
         if(hardCancel) zipcasterPlayer.ziptoit$hardCancelZipcast();
+
+        if(player instanceof ServerPlayerEntity playerEntity) {
+            ZipcasterEvents.ZIPCAST_END.invoker().onZipcastEnd(playerEntity, zipcasterPlayer.zipcastTarget(), true);
+        }
 
         if(!sendPackets) return;
         if(player.getWorld().isClient) {

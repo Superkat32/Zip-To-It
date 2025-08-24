@@ -3,6 +3,7 @@ package net.superkat.ziptoit.item;
 import net.fabricmc.fabric.api.item.v1.ComponentTooltipAppenderRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
@@ -13,14 +14,22 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
 import net.superkat.ziptoit.ZipToIt;
 import net.superkat.ziptoit.zipcast.color.StickyHandColors;
 import net.superkat.ziptoit.zipcast.color.ZipcastColor;
+import org.apache.commons.lang3.StringUtils;
+import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public class ZipToItItems {
+    private static final boolean PRINT_GIVE_COMMANDS = true;
+    private static final List<String> PRINTABLE_GIVE_COMMANDS_INTEGER = new ArrayList<>();
+    private static final List<String> PRINTABLE_GIVE_COMMANDS_VECTORS = new ArrayList<>();
 
     public static final TagKey<Item> STICKY_HANDS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ZipToIt.MOD_ID, "sticky_hands"));
 
@@ -72,6 +81,19 @@ public class ZipToItItems {
             addStickyHandToItemGroup(group, BROWN_STICKY_HAND);
             addStickyHandToItemGroup(group, BLACK_STICKY_HAND);
         });
+
+        // dev env check in case I forgot to disable it lol
+        if(PRINT_GIVE_COMMANDS && FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            ZipToIt.LOGGER.info("----------");
+
+            String intList = String.join("\n", PRINTABLE_GIVE_COMMANDS_INTEGER);
+            ZipToIt.LOGGER.info("All Zippy Sticky Hand give commands (integers): \n" + intList);
+
+            ZipToIt.LOGGER.info("----------");
+            String vecList = String.join("\n", PRINTABLE_GIVE_COMMANDS_VECTORS);
+            ZipToIt.LOGGER.info("All Zippy Sticky Hand give commands (Vector3f's): \n" + vecList);
+            ZipToIt.LOGGER.info("----------");
+        }
     }
 
     private static void addStickyHandToItemGroup(FabricItemGroupEntries group, Item stickyHand) {
@@ -82,13 +104,72 @@ public class ZipToItItems {
     }
 
     private static Item registerStickyHand(String id, ZipcastColor color) {
-        return registerItem(id,
+        Item item = registerItem(id,
                 StickyHandItem::new,
                 new Item.Settings()
                         .component(STICKY_HAND_COMPONENT_TYPE, new StickyHandComponent(48, 2.25f, -1, color))
                         .component(ZIPS_USED_COMPONENT_TYPE, new ZipsUsedComponent(0))
                         .maxCount(1)
         );
+
+        if(PRINT_GIVE_COMMANDS) {
+            int mainColor = color.color();
+            int altColor = color.altColor();
+            int brightColor = color.brightColor();
+            int previewColor = color.previewColor();
+            Vector3f mainColorVec = ColorHelper.toVector(mainColor);
+            Vector3f altColorVec = ColorHelper.toVector(altColor);
+            Vector3f brightColorVec = ColorHelper.toVector(brightColor);
+            Vector3f previewColorVec = ColorHelper.toVector(previewColor);
+
+            // Object oriented programming
+            String intGive = stringGiveCommand(item, String.valueOf(mainColor), String.valueOf(altColor), String.valueOf(brightColor), String.valueOf(previewColor));
+            String vectorGive = stringGiveCommand(item, stringVector3f(mainColorVec), stringVector3f(altColorVec), stringVector3f(brightColorVec), stringVector3f(previewColorVec));
+            PRINTABLE_GIVE_COMMANDS_INTEGER.add(intGive);
+            PRINTABLE_GIVE_COMMANDS_VECTORS.add(vectorGive);
+        }
+
+        return item;
+    }
+
+    private static String stringField(String field, String value) {
+        return stringField(field, value, false);
+    }
+
+    private static String stringField(String field, String value, boolean last) {
+        return "\"" + field + "\":" + value + (last ? "" : ", ");
+    }
+
+    private static String stringGiveCommand(Item item, String mainColorValue, String altColorValue, String brightColorValue, String previewColorValue) {
+
+        // Very safe! Very epic!
+        String translation = item.getTranslationKey();
+        String translationName = translation.replaceAll("item.ziptoit.", "");
+        String colorTranslation = translationName.replaceAll("_zippy_hand", "");
+        String colorName = StringUtils.capitalize(colorTranslation.replaceAll("_", " "));
+
+        // Adding the Markdown "`" and extra 2 spaces at the end for easier copy pasting
+        String giveStart =  colorName + ": `/give @s " + item.getRegistryEntry().getKey().get().getValue() + "[ziptoit:zipcaster={\"zipcast_color\":{";
+        String giveEnd = "}}]`  ";
+
+        String mainColor = stringField("color", mainColorValue);
+        String altColor = stringField("altColor", altColorValue);
+        String brightColor = stringField("brightColor", brightColorValue);
+        String previewColor = stringField("previewColor", previewColorValue, true);
+
+        return giveStart + mainColor + altColor + brightColor + previewColor + giveEnd;
+    }
+
+    private static String stringVector3f(Vector3f vector3f) {
+        return "[" + vector3f.x + ", " + vector3f.y + ", " + vector3f.z + "]";
+    }
+
+    private static String stringList(List<String> list) {
+        StringBuilder string = new StringBuilder();
+        for (String s : list) {
+            string.append(s);
+        }
+        return string.toString();
     }
 
     private static Item registerItem(String id, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {
