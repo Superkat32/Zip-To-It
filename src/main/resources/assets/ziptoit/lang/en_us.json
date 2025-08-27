@@ -16,6 +16,9 @@
   "item.ziptoit.brown_zippy_hand": "Brown Zippy Sticky Hand",
   "item.ziptoit.black_zippy_hand": "Black Zippy Sticky Hand",
 
+  "item.ziptoit.pride_zippy_hand": "Pride Zippy Sticky Hand",
+  "item.ziptoit.trans_zippy_hand": "Trans Zippy Sticky Hand",
+
   "item.ziptoit.zippy_hand.ziprange": "Zip Range:",
   "item.ziptoit.zippy_hand.zipspeed": "Zip Speed:",
   "item.ziptoit.zippy_hand.zipuses": "Zips Remaining:",
@@ -37,5 +40,7 @@
   "death.fell.accident.zipcast.notstolenfromterraria": "%1$s was ziiiiip, zipcastin'",
   "death.fell.accident.zipcast.notstolenfromfreebird": "%1$s wasn't as free as a Zipcaster",
   "death.fell.accident.zipcast.fall": "%1$s discovered fall damage still applies to Zipcasters",
-  "death.fell.accident.zipcast.splatted": "%1$s was splatted by Zipcaster using Ground"
+  "death.fell.accident.zipcast.splatted": "%1$s was splatted by Zipcaster using Ground",
+  "death.fell.accident.zipcast.monkey_crab": "%1$s met Monkey Crab in Silly Land",
+  "death.fell.accident.zipcast.facts": "%1$s experienced how it feels to discover the shear and utter disappointment upon realization that the Splatoon devs love putting the best Salmon Run S-tier weapon rotations on the worst map that's terrible to play on - the boat."
 }

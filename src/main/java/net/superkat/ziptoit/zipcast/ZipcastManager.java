@@ -32,6 +32,10 @@ public class ZipcastManager {
     public static void startZipcast(LivingEntity player, ZipcastTarget zipcastTarget, boolean sendPackets) {
         if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
+        if(zipcasterPlayer.slowFallForZipcast() && zipcasterPlayer.ticksSinceZipcastActivate() <= 20) {
+            player.fallDistance -= 7;
+        }
+
         zipcasterPlayer.ziptoit$startZipcast(zipcastTarget);
 
         if(player instanceof ServerPlayerEntity serverPlayer) {
@@ -87,6 +91,7 @@ public class ZipcastManager {
         }
         player.setNoGravity(true);
         player.setPosition(pos);
+        player.fallDistance = 0;
 
         if(player instanceof ServerPlayerEntity playerEntity) {
             ZipcasterEvents.WALL_STICK_START.invoker().onWallStickStart(playerEntity, pos, wallPos);
@@ -136,6 +141,10 @@ public class ZipcastManager {
 
     public static void cancelZipcast(LivingEntity player, boolean hardCancel, boolean sendPackets) {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
+
+        if(zipcasterPlayer.ticksSinceZipcastActivate() <= 30) {
+            player.fallDistance += 15;
+        }
 
         player.playSound(SoundEvents.ITEM_TRIDENT_THUNDER.value(), 0.75f, 1f);
         zipcasterPlayer.ziptoit$softCancelZipcast();

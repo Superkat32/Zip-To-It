@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.GameRules;
 import net.superkat.ziptoit.compat.GooGunCompat;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
@@ -42,7 +43,9 @@ public class ZipToIt implements ModInitializer {
 		ZipToItPackets.init();
 		ZipToItServerNetworkHandler.init();
 
-		GooGunCompat.init();
+		if(gooGunLoaded()) {
+			GooGunCompat.init();
+		}
 
 //		ZipcasterEvents.ZIPCAST_START.register((player, zipcastTarget) -> {
 //			LOGGER.info("hi player");
@@ -77,6 +80,10 @@ public class ZipToIt implements ModInitializer {
 		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
 			ServerPlayNetworking.send(newPlayer, new AllowZipcastingZipcastS2CPacket(newPlayer.getWorld().getGameRules().getBoolean(ALLOW_ZIPCAST_DURING_ZIPCAST)));
 		});
+	}
+
+	public static boolean gooGunLoaded() {
+		return FabricLoader.getInstance().isModLoaded("googun");
 	}
 
 }

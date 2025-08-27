@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.ColorLerper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
@@ -42,7 +43,13 @@ public class RaycastRenderer {
         Vec3d playerPos = player.getLerpedPos(tickProgress);
         Vec3d raycastPos = raycast.getPos();
 
-        int previewColor = zipcastColor.previewColor();
+        int previewColor;
+        if(zipcastColor.rainbow()) {
+            // Adding 75 to skip ahead of the white colors
+            previewColor = ColorLerper.lerpColor(ColorLerper.Type.MUSIC_NOTE, player.getItemUseTime() + 75);
+        } else {
+            previewColor = zipcastColor.previewColor();
+        }
 
         // Ever so slightly cursed but its ModFest its fine
         matrices.push();

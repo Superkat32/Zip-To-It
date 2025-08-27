@@ -1,6 +1,5 @@
 package net.superkat.ziptoit.compat;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.World;
 import net.superkat.ziptoit.api.ZipcasterEvents;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
@@ -9,8 +8,6 @@ import toad.googun.block.ModBlocks;
 public class GooGunCompat {
 
     public static void init() {
-        if(!gooGunLoaded()) return;
-
         ZipcasterEvents.ALLOW_WALL_STICK.register((player, zipcastTarget, playerTeleportPos, wallBlockPos) -> {
             if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return true;
             World world = player.getWorld();
@@ -42,10 +39,6 @@ public class GooGunCompat {
 
             return true;
         });
-    }
-
-    public static boolean gooGunLoaded() {
-        return FabricLoader.getInstance().isModLoaded("googun");
     }
 
 }

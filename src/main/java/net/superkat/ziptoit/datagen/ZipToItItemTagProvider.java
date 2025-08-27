@@ -31,7 +31,10 @@ public class ZipToItItemTagProvider extends FabricTagProvider.ItemTagProvider {
                 ZipToItItems.LIGHT_GRAY_STICKY_HAND,
                 ZipToItItems.GRAY_STICKY_HAND,
                 ZipToItItems.BROWN_STICKY_HAND,
-                ZipToItItems.BLACK_STICKY_HAND
+                ZipToItItems.BLACK_STICKY_HAND,
+
+                ZipToItItems.PRIDE_STICKY_HAND,
+                ZipToItItems.TRANS_STICKY_HANDER
         );
     }
 }

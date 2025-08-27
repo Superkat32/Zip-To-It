@@ -1,0 +1,6 @@
+{
+  "parent": "ziptoit:item/using_zippy_sticky_hand",
+  "textures": {
+    "layer0": "ziptoit:item/brown_zippy_hand"
+  }
+}

@@ -10,6 +10,7 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
+import net.superkat.ziptoit.zipcast.color.StickyHandColors;
 import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -39,7 +40,15 @@ public class ZipcastZoomParticle extends SpriteBillboardParticle {
 
         ZipcastColor zipcastColor = params.zipcastColor();
 
-        int color = this.random.nextFloat() <= 0.25f ? zipcastColor.altColor() : zipcastColor.color();
+        int color;
+        if(zipcastColor.rainbow()) {
+            int maxColors = StickyHandColors.RAINBOW_DYES.size();
+            int index = this.random.nextInt(maxColors);
+            color = StickyHandColors.RAINBOW_DYES.get(index).getEntityColor();
+        } else {
+            color = this.random.nextFloat() <= 0.25f ? zipcastColor.altColor() : zipcastColor.color();
+        }
+
         this.setColorFromInt(color);
 
         this.setSprite(this.spriteProvider);

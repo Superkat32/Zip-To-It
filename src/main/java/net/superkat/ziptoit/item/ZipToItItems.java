@@ -60,6 +60,9 @@ public class ZipToItItems {
     public static final Item BROWN_STICKY_HAND = registerStickyHand("brown_zippy_hand", StickyHandColors.BROWN);
     public static final Item BLACK_STICKY_HAND = registerStickyHand("black_zippy_hand", StickyHandColors.BLACK);
 
+    public static final Item PRIDE_STICKY_HAND = registerStickyHand("pride_zippy_hand", StickyHandColors.PRIDE);
+    public static final Item TRANS_STICKY_HANDER = registerStickyHand("trans_zippy_hand", StickyHandColors.TRANS);
+
     public static void init() {
         ComponentTooltipAppenderRegistry.addLast(ZipToItItems.STICKY_HAND_COMPONENT_TYPE);
 
@@ -80,16 +83,20 @@ public class ZipToItItems {
             addStickyHandToItemGroup(group, GRAY_STICKY_HAND);
             addStickyHandToItemGroup(group, BROWN_STICKY_HAND);
             addStickyHandToItemGroup(group, BLACK_STICKY_HAND);
+
+            addStickyHandToItemGroup(group, PRIDE_STICKY_HAND);
+            addStickyHandToItemGroup(group, TRANS_STICKY_HANDER);
         });
 
         // dev env check in case I forgot to disable it lol
+        // oh my gosh i actually forgot in that same commit that's craazy
         if(PRINT_GIVE_COMMANDS && FabricLoader.getInstance().isDevelopmentEnvironment()) {
             ZipToIt.LOGGER.info("----------");
-
             String intList = String.join("\n", PRINTABLE_GIVE_COMMANDS_INTEGER);
             ZipToIt.LOGGER.info("All Zippy Sticky Hand give commands (integers): \n" + intList);
 
             ZipToIt.LOGGER.info("----------");
+
             String vecList = String.join("\n", PRINTABLE_GIVE_COMMANDS_VECTORS);
             ZipToIt.LOGGER.info("All Zippy Sticky Hand give commands (Vector3f's): \n" + vecList);
             ZipToIt.LOGGER.info("----------");
@@ -117,14 +124,16 @@ public class ZipToItItems {
             int altColor = color.altColor();
             int brightColor = color.brightColor();
             int previewColor = color.previewColor();
+            boolean alternate = color.alternate();
+            boolean rainbow = color.rainbow();
             Vector3f mainColorVec = ColorHelper.toVector(mainColor);
             Vector3f altColorVec = ColorHelper.toVector(altColor);
             Vector3f brightColorVec = ColorHelper.toVector(brightColor);
             Vector3f previewColorVec = ColorHelper.toVector(previewColor);
 
             // Object oriented programming
-            String intGive = stringGiveCommand(item, String.valueOf(mainColor), String.valueOf(altColor), String.valueOf(brightColor), String.valueOf(previewColor));
-            String vectorGive = stringGiveCommand(item, stringVector3f(mainColorVec), stringVector3f(altColorVec), stringVector3f(brightColorVec), stringVector3f(previewColorVec));
+            String intGive = stringGiveCommand(item, String.valueOf(mainColor), String.valueOf(altColor), String.valueOf(brightColor), String.valueOf(previewColor), alternate, rainbow);
+            String vectorGive = stringGiveCommand(item, stringVector3f(mainColorVec), stringVector3f(altColorVec), stringVector3f(brightColorVec), stringVector3f(previewColorVec), alternate, rainbow);
             PRINTABLE_GIVE_COMMANDS_INTEGER.add(intGive);
             PRINTABLE_GIVE_COMMANDS_VECTORS.add(vectorGive);
         }
@@ -140,8 +149,7 @@ public class ZipToItItems {
         return "\"" + field + "\":" + value + (last ? "" : ", ");
     }
 
-    private static String stringGiveCommand(Item item, String mainColorValue, String altColorValue, String brightColorValue, String previewColorValue) {
-
+    private static String stringGiveCommand(Item item, String mainColorValue, String altColorValue, String brightColorValue, String previewColorValue, boolean alternate, boolean rainbow) {
         // Very safe! Very epic!
         String translation = item.getTranslationKey();
         String translationName = translation.replaceAll("item.ziptoit.", "");
@@ -152,24 +160,20 @@ public class ZipToItItems {
         String giveStart =  colorName + ": `/give @s " + item.getRegistryEntry().getKey().get().getValue() + "[ziptoit:zipcaster={\"zipcast_color\":{";
         String giveEnd = "}}]`  ";
 
+        boolean previewIsLast = !alternate && !rainbow;
+
         String mainColor = stringField("color", mainColorValue);
         String altColor = stringField("altColor", altColorValue);
         String brightColor = stringField("brightColor", brightColorValue);
-        String previewColor = stringField("previewColor", previewColorValue, true);
+        String previewColor = stringField("previewColor", previewColorValue, previewIsLast);
+        String alternateString = alternate ? stringField("alternate", String.valueOf(true), !rainbow) : "";
+        String rainbowString = rainbow ? stringField("rainbow", String.valueOf(true), true) : "";
 
-        return giveStart + mainColor + altColor + brightColor + previewColor + giveEnd;
+        return giveStart + mainColor + altColor + brightColor + previewColor + alternateString + rainbowString + giveEnd;
     }
 
     private static String stringVector3f(Vector3f vector3f) {
         return "[" + vector3f.x + ", " + vector3f.y + ", " + vector3f.z + "]";
-    }
-
-    private static String stringList(List<String> list) {
-        StringBuilder string = new StringBuilder();
-        for (String s : list) {
-            string.append(s);
-        }
-        return string.toString();
     }
 
     private static Item registerItem(String id, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {

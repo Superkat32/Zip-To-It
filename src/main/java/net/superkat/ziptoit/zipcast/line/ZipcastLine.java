@@ -2,12 +2,14 @@ package net.superkat.ziptoit.zipcast.line;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.item.ZipToItItems;
 import net.superkat.ziptoit.render.zipcast.ZipcastRenderer;
+import net.superkat.ziptoit.zipcast.color.StickyHandColors;
 import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 import net.superkat.ziptoit.zipcast.movement.ZipcastTarget;
 
@@ -109,16 +111,34 @@ public class ZipcastLine {
         // These points will then be rendered in one connected line, so they must be in order!
         int lerpPoints = subdivisions - (subdivisions / 2);
         float colorLerpAmount = 1f / lerpPoints;
+
+        boolean shouldAlternateColors = zipcastColor.alternate();
+        int pointsPerColor = 2; // only used for alternating colors
+
+        boolean rainbow = zipcastColor.rainbow();
+
         for (int i = 0; i <= subdivisions; i++) {
             float subdivideAmount = subdivisionAmount * i;
             Vec3d vec3d = playerPos.add(difference.multiply(subdivideAmount));
             float offset = MathHelper.sin(zipcastTicks * tickMultiplier + i) * offsetMultiplier;
 
-            float colorLerp = 1f;
-            if(i <= lerpPoints) {
-                colorLerp = i * colorLerpAmount;
+            int color;
+            if(shouldAlternateColors) {
+                boolean alt = (i / pointsPerColor) % pointsPerColor == 0;
+                color = alt ? altColor : mainColor;
+            } else if (rainbow) {
+                float colorLerp = (float) i / subdivisions ;
+                DyeColor dyeColor = StickyHandColors.RAINBOW_DYES.get(i);
+                DyeColor nextDyeColor = StickyHandColors.RAINBOW_DYES.get(i + 1);
+                color = ColorHelper.lerp(colorLerp, dyeColor.getEntityColor(), nextDyeColor.getEntityColor());
+            } else {
+                float colorLerp = 1f;
+                if(i <= lerpPoints) {
+                    colorLerp = i * colorLerpAmount;
+                }
+
+                color = ColorHelper.lerp(colorLerp, altColor, mainColor);
             }
-            int color = ColorHelper.lerp(colorLerp, altColor, mainColor);
 
             if(brighten) {
                 color = ColorHelper.lerp(brightenLerp, color, brightColor);

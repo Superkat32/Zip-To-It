@@ -1,12 +1,27 @@
 package net.superkat.ziptoit.zipcast.color;
 
+import net.minecraft.util.DyeColor;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class StickyHandColors {
-    // Java.awt.Color can't be used because of a specific issue on some Mac's. So, this is the alternative
-    // The colors are commented out for easy viewing / editing within an IDE (should your IDE have a color picker)
+    // Java.awt.Color can't be used because of a specific issue on some Mac's. So, manual colors is the alternative
+    // The Colors are commented out for easy viewing / editing within an IDE (should your IDE have a color picker)
     // You may need to import the Color class to see the color, but don't forgot to optimize imports afterwards!
+
+    public static final List<DyeColor> RAINBOW_DYES = List.of(
+            DyeColor.RED,
+            DyeColor.ORANGE,
+            DyeColor.YELLOW,
+            DyeColor.LIME,
+            DyeColor.BLUE,
+            DyeColor.CYAN,
+            DyeColor.LIGHT_BLUE,
+            DyeColor.PINK,
+            DyeColor.MAGENTA,
+            DyeColor.PURPLE
+    );
 
     private static final List<ZipcastColor> DEFAULT_COLORS = new ArrayList<>();
 
@@ -186,6 +201,20 @@ public class StickyHandColors {
             0, 0, 0
     );
 
+
+
+    public static final ZipcastColor PRIDE = register(
+            ZipcastColor.fromRainbow()
+    );
+
+    public static final ZipcastColor TRANS = register(
+            153, 246, 255,
+            255, 160, 255,
+            251, 235, 252,
+            116, 250, 255,
+            true
+    );
+
     public static void init() {
         // NO OP - init method may not be needed but just in case I guess
     }
@@ -196,13 +225,33 @@ public class StickyHandColors {
             int brightRed, int brightGreen, int brightBlue,
             int previewRed, int previewGreen, int previewBlue
     ) {
+        return register(
+                red, green, blue,
+                altRed, altGreen, altBlue,
+                brightRed, brightGreen, brightBlue,
+                previewRed, previewGreen, previewBlue,
+                false
+        );
+    }
+
+    public static ZipcastColor register(
+            int red, int green, int blue,
+            int altRed, int altGreen, int altBlue,
+            int brightRed, int brightGreen, int brightBlue,
+            int previewRed, int previewGreen, int previewBlue,
+            boolean alternate
+    ) {
         ZipcastColor color = ZipcastColor.fromRgbIntegers(
                 red, green, blue,
                 altRed, altGreen, altBlue,
                 brightRed, brightGreen, brightBlue,
-                previewRed, previewGreen, previewBlue
+                previewRed, previewGreen, previewBlue, alternate
         );
 
+        return register(color);
+    }
+
+    public static ZipcastColor register(ZipcastColor color) {
         DEFAULT_COLORS.add(color);
         return color;
     }

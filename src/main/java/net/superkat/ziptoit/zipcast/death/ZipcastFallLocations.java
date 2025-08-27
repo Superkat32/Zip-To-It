@@ -24,6 +24,8 @@ public class ZipcastFallLocations {
     public static final FallLocation NOT_STOLEN_FROM_FREE_BIRD = registerZipcast("notstolenfromfreebird");
     public static final FallLocation FALL = registerZipcast("fall");
     public static final FallLocation SPLATTED = registerZipcast("splatted");
+    public static final FallLocation MONKEY_CRAB = registerZipcast("monkey_crab");
+    public static final FallLocation FACTS = registerZipcast("facts");
 
     private static FallLocation registerZipcast(String id) {
         FallLocation fallLocation = new FallLocation("zipcast." + id);
@@ -35,11 +37,20 @@ public class ZipcastFallLocations {
         if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return original;
 
         if(zipcasterPlayer.showZipcastDeathMessage()) {
-            int index = player.getRandom().nextInt(ZIPCAST_FALL_LOCATIONS.size());
-            return ZIPCAST_FALL_LOCATIONS.get(index);
+            FallLocation msg = rollMessage(player);
+            if(msg == FACTS) { // make it rare
+                msg = rollMessage(player);
+            }
+
+            return msg;
         }
 
         return original;
+    }
+
+    private static FallLocation rollMessage(LivingEntity player) {
+        int index = player.getRandom().nextInt(ZIPCAST_FALL_LOCATIONS.size());
+        return ZIPCAST_FALL_LOCATIONS.get(index);
     }
 
 }

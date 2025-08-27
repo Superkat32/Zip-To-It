@@ -16,6 +16,7 @@ import net.superkat.ziptoit.particle.ZipcastImpactSplatterEffect;
 import net.superkat.ziptoit.particle.ZipcastLandParticleEffect;
 import net.superkat.ziptoit.particle.ZipcastZoomParticleEffect;
 import net.superkat.ziptoit.zipcast.ZipcastManager;
+import net.superkat.ziptoit.zipcast.color.StickyHandColors;
 import net.superkat.ziptoit.zipcast.color.ZipcastColor;
 import net.superkat.ziptoit.zipcast.line.ZipcastLine;
 import net.superkat.ziptoit.zipcast.util.ZipcastClientHelper;
@@ -271,7 +272,17 @@ public class ZipcasterMovement {
         float y = (float) (target.getY() + offsetY + (0.5f * playerScale));
         float z = (float) (target.getZ() + offsetZ);
 
-        Vector3f color = ColorHelper.toVector(zipcastTarget.color().color());
+        ZipcastColor zipcastColor = zipcastTarget.color();
+
+        Vector3f color;
+        if(zipcastColor.rainbow()) {
+            int maxColors = StickyHandColors.RAINBOW_DYES.size();
+            int index = player.getRandom().nextInt(maxColors);
+            color = ColorHelper.toVector(StickyHandColors.RAINBOW_DYES.get(index).getEntityColor());
+        } else {
+            color = ColorHelper.toVector(zipcastColor.color());
+        }
+
 
         // explosion particle
         player.getWorld().addParticleClient(
