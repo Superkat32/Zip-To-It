@@ -116,7 +116,7 @@ Gray: `/give @s ziptoit:gray_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"col
 Brown: `/give @s ziptoit:brown_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-10401733, "altColor":-10141659, "brightColor":-4943749, "previewColor":-13232895}}]`  
 Black: `/give @s ziptoit:black_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-14606039, "altColor":-15921903, "brightColor":-10790022, "previewColor":-16777216}}]`  
 Pride: `/give @s ziptoit:pride_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-7785800, "altColor":-816214, "brightColor":-1, "previewColor":-5231066, "rainbow":true}}]`  
-Transgender: `/give @s ziptoit:transgender_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-6686977, "altColor":-24321, "brightColor":-267268, "previewColor":-9110785, "alternate":true}}]`
+Trans: `/give @s ziptoit:trans_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":-6686977, "altColor":-24321, "brightColor":-267268, "previewColor":-9110785, "alternate":true}}]`  
 
 ##### Defaults (Vector3f's)
 Red: `/give @s ziptoit:red_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.92156863, 0.0, 0.047058824], "altColor":[0.9882353, 0.0, 0.44313726], "brightColor":[1.0, 0.85882354, 0.85882354], "previewColor":[1.0, 0.0, 0.0]}}]`  
@@ -135,5 +135,5 @@ Light gray: `/give @s ziptoit:light_gray_zippy_hand[ziptoit:zipcaster={"zipcast_
 Gray: `/give @s ziptoit:gray_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.91764706, 0.9372549, 0.9372549], "altColor":[0.63529414, 0.654902, 0.654902], "brightColor":[0.85490197, 1.0, 1.0], "previewColor":[0.7882353, 0.7882353, 0.7882353]}}]`  
 Brown: `/give @s ziptoit:brown_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.38039216, 0.28235295, 0.23137255], "altColor":[0.39607844, 0.2509804, 0.14509805], "brightColor":[0.7058824, 0.5647059, 0.48235294], "previewColor":[0.21176471, 0.08235294, 0.003921569]}}]`  
 Black: `/give @s ziptoit:black_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.12941177, 0.12941177, 0.16078432], "altColor":[0.050980393, 0.050980393, 0.06666667], "brightColor":[0.35686275, 0.35686275, 0.47843137], "previewColor":[0.0, 0.0, 0.0]}}]`
-Pride: `/give @s ziptoit:pride_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.5372549, 0.19607843, 0.72156864], "altColor":[0.9529412, 0.54509807, 0.6666667], "brightColor":[1.0, 1.0, 1.0], "previewColor":[0.6901961, 0.18039216, 0.14901961], "rainbow":true}}]`  
-Transgender: `/give @s ziptoit:transgender_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.6, 0.9647059, 1.0], "altColor":[1.0, 0.627451, 1.0], "brightColor":[0.9843137, 0.92156863, 0.9882353], "previewColor":[0.45490196, 0.98039216, 1.0], "alternate":true}}]`  
+Pride: `/give @s ziptoit:pride_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.5372549, 0.19607843, 0.72156864], "altColor":[0.9529412, 0.54509807, 0.6666667], "brightColor":[1.0, 1.0, 1.0], "previewColor":[0.6901961, 0.18039216, 0.14901961], "rainbow":true}}]`    
+Trans: `/give @s ziptoit:trans_zippy_hand[ziptoit:zipcaster={"zipcast_color":{"color":[0.6, 0.9647059, 1.0], "altColor":[1.0, 0.627451, 1.0], "brightColor":[0.9843137, 0.92156863, 0.9882353], "previewColor":[0.45490196, 0.98039216, 1.0], "alternate":true}}]`  
