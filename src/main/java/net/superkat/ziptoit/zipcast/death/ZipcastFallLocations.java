@@ -2,6 +2,8 @@ package net.superkat.ziptoit.zipcast.death;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.FallLocation;
+import net.superkat.ziptoit.ZipToIt;
+import net.superkat.ziptoit.compat.BeASquidKid;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 
 import java.util.ArrayList;
@@ -36,10 +38,14 @@ public class ZipcastFallLocations {
     public static FallLocation modifyFallLocationForZipcaster(LivingEntity player, FallLocation original) {
         if(!(player instanceof ZipcasterPlayer zipcasterPlayer)) return original;
 
-        if(zipcasterPlayer.showZipcastDeathMessage()) {
+        if(zipcasterPlayer.showZipcastDeathMessage() || zipcasterPlayer.ticksSinceZipcastEnd() <= 60) {
             FallLocation msg = rollMessage(player);
             if(msg == FACTS) { // make it rare
                 msg = rollMessage(player);
+            }
+
+            if(ZipToIt.beADollLoaded() && BeASquidKid.playerIsDoll(player)) {
+                 msg = BeASquidKid.rollDollMessage(player);
             }
 
             return msg;

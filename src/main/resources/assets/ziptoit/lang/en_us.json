@@ -42,5 +42,10 @@
   "death.fell.accident.zipcast.fall": "%1$s discovered fall damage still applies to Zipcasters",
   "death.fell.accident.zipcast.splatted": "%1$s was splatted by Zipcaster using Ground",
   "death.fell.accident.zipcast.monkey_crab": "%1$s met Monkey Crab in Silly Land",
-  "death.fell.accident.zipcast.facts": "%1$s experienced how it feels to discover the shear and utter disappointment upon realization that the Splatoon devs love putting the best Salmon Run S-tier weapon rotations on the worst map that's terrible to play on - the boat."
+  "death.fell.accident.zipcast.facts": "%1$s experienced how it feels to discover the shear and utter disappointment upon realization that the Splatoon devs love putting the best Salmon Run S-tier weapon rotations on the worst map that's terrible to play on - the boat.",
+
+  "death.fell.accident.zipcast_doll.needle": "%1$s couldn't zip the needle",
+  "death.fell.accident.zipcast_doll.splatted": "%1$s splatted",
+  "death.fell.accident.zipcast_doll.unraveled": "%1$s zipped and unraveled",
+  "death.fell.accident.zipcast_doll.blanket": "%1$s tried zipping with a weighted blanket"
 }

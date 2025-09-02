@@ -18,4 +18,19 @@ public class LivingEntityMixin extends EntityMixin {
         return original;
     }
 
+//    @WrapOperation(method = "handleFallDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;serverDamage(Lnet/minecraft/entity/damage/DamageSource;F)V"))
+//    public void ziptoit$modifyFallDamageSourceForZipcasterDamageSource(LivingEntity instance, DamageSource damageSource, float v, Operation<Void> original) {
+//        if(instance instanceof ZipcasterPlayer zipcasterPlayer && (zipcasterPlayer.isZipcasting() || zipcasterPlayer.slowFallForZipcast())) {
+//            DamageSource zipcasterDamageSource = new DamageSource(
+//                    instance.getWorld().getRegistryManager()
+//                            .getOrThrow(RegistryKeys.DAMAGE_TYPE)
+//                            .getEntry(ZipToItDamageTypes.ZIPCASTER.getValue()).get()
+//            );
+//            original.call(instance, zipcasterDamageSource, v);
+//            return;
+//        }
+//
+//        original.call(instance, damageSource, v);
+//    }
+
 }

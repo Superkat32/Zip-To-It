@@ -27,6 +27,7 @@ public class ZipcasterMovement {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 //        if(!player.getWorld().getTickManager().shouldTick()) return;
         zipcasterPlayer.increaseLastZipcastActivateTicks();
+        zipcasterPlayer.increaseTicksSinceZipcastEnd();
 
         if(zipcasterPlayer.isZipcasting()) {
             zipcasterPlayer.increaseZipcastTicks();
@@ -81,8 +82,17 @@ public class ZipcasterMovement {
         Vec3d zipcastPos = zipcastTarget.pos();
         Vec3d currentPos = player.getPos().add(0, 0.5, 0);
 
+        boolean sneaking = player.isSneaking();
+        boolean sneakShouldCancel = zipcasterPlayer.sneakShouldCancelZipcast();
+        boolean sneakCancel = false;
+        if(sneakShouldCancel) {
+            sneakCancel = sneaking;
+        } else if(!sneaking) {
+            zipcasterPlayer.setSneakShouldCancelZipcast(true);
+        }
+
         // Check to see if zipcast should be canceled
-        if((zipcasterPlayer.zipcastTicks() >= 200 || player.isSneaking()) && player.isLogicalSideForUpdatingMovement()) {
+        if((sneakCancel || zipcasterPlayer.zipcastTicks() >= 200) && player.isLogicalSideForUpdatingMovement()) {
             // Sneaking is technically supposed to be an emergency exit in case my code messes up,
             // but I think it allows for some fun uses elsewhere, so it's staying in
             player.playSound(SoundEvents.ITEM_TRIDENT_THUNDER.value(), 0.75f, 1f);

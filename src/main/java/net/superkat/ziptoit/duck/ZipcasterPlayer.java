@@ -79,6 +79,14 @@ public interface ZipcasterPlayer {
         this.setTicksSinceZipcastActivate(this.ticksSinceZipcastActivate() + 1);
     }
 
+    int ticksSinceZipcastEnd();
+
+    void setTicksSinceZipcastEnd(int ticksSinceZipcastEnd);
+
+    default void increaseTicksSinceZipcastEnd() {
+        this.setTicksSinceZipcastEnd(this.ticksSinceZipcastEnd() + 1);
+    }
+
     default boolean shouldPlayZipcastActiveSound() {
         return this.ticksSinceZipcastActivate() >= StickyHandItem.TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND;
     }
@@ -90,5 +98,9 @@ public interface ZipcasterPlayer {
     boolean allowZipcastDuringZipcast();
 
     void setAllowZipcastDuringZipcast(boolean allow);
+
+    boolean sneakShouldCancelZipcast();
+
+    void setSneakShouldCancelZipcast(boolean sneakShouldCancelZipcast);
 
 }

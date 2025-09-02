@@ -86,4 +86,8 @@ public class ZipToIt implements ModInitializer {
 		return FabricLoader.getInstance().isModLoaded("googun");
 	}
 
+	public static boolean beADollLoaded() {
+		return FabricLoader.getInstance().isModLoaded("be_a_doll");
+	}
+
 }

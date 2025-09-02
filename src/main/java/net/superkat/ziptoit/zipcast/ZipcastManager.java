@@ -13,6 +13,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.superkat.ziptoit.api.ZipcasterEvents;
 import net.superkat.ziptoit.duck.ZipcasterPlayer;
 import net.superkat.ziptoit.item.StickyHandComponent;
@@ -37,6 +38,7 @@ public class ZipcastManager {
         }
 
         zipcasterPlayer.ziptoit$startZipcast(zipcastTarget);
+        zipcasterPlayer.setSneakShouldCancelZipcast(!player.isSneaking());
 
         if(player instanceof ServerPlayerEntity serverPlayer) {
 //            ItemStack stack = serverPlayer.getActiveItem();
@@ -143,7 +145,9 @@ public class ZipcastManager {
         if (!(player instanceof ZipcasterPlayer zipcasterPlayer)) return;
 
         if(zipcasterPlayer.ticksSinceZipcastActivate() <= 30) {
-            player.fallDistance += 15;
+            if(player.fallDistance >= 15) { // only punish player if they've already fallen a little
+                player.fallDistance += 15;
+            }
         }
 
         player.playSound(SoundEvents.ITEM_TRIDENT_THUNDER.value(), 0.75f, 1f);
@@ -192,13 +196,25 @@ public class ZipcastManager {
 
         int zipRange = 48;
         if(component != null) zipRange = component.zipRange();
-
-        HitResult raycast = entity.raycast(zipRange, tickProgress, false);
+        
+        HitResult raycast = raycast(entity, zipRange, tickProgress, false);
         if(raycast.getType() == HitResult.Type.BLOCK) {
             if(!entity.getWorld().getWorldBorder().contains(raycast.getPos())) return null;
             return (BlockHitResult) raycast;
         }
         return null;
+    }
+
+    public static HitResult raycast(LivingEntity entity, double maxDistance, float tickProgress, boolean includeFluids) {
+        Vec3d vec3d = entity.getCameraPosVec(tickProgress);
+        Vec3d vec3d2 = entity.getRotationVec(tickProgress);
+        Vec3d vec3d3 = vec3d.add(vec3d2.x * maxDistance, vec3d2.y * maxDistance, vec3d2.z * maxDistance);
+        return entity.getWorld()
+                .raycast(
+                        new RaycastContext(
+                                vec3d, vec3d3, RaycastContext.ShapeType.COLLIDER, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, entity
+                        )
+                );
     }
 
     public static Arm getArmHoldingStickyHand(PlayerEntity player) {

@@ -43,9 +43,13 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Unique
     public int ticksSinceLastZipcast = StickyHandItem.TICKS_UNTIL_ZIPCAST_ACTIVE_SOUND;
     @Unique
+    public int ticksSinceZipcastEnd = 0;
+    @Unique
     public boolean allowZipcastDuringZipcast = true;
     @Unique
     public boolean showZipcastDeathMessage = false;
+    @Unique
+    public boolean sneakShouldCancelZipcast = true;
 
     // The main tick method where tick related numbers are increased, and stuff like slow falling is applied
     @Inject(method = "tick", at = @At(value = "HEAD"))
@@ -142,6 +146,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         this.zipcastLine = null;
         this.noClipForZipcast = false;
         this.showZipcastDeathMessage = true;
+        this.ticksSinceZipcastEnd = 0;
     }
 
     @Override
@@ -169,6 +174,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
         this.noClipForZipcast = false;
         this.zipcastTicks = 0;
         this.wallTicks = 0;
+        this.ticksSinceZipcastEnd = 0;
 
         this.slowFallForZipcast = true;
         this.showZipcastDeathMessage = true;
@@ -284,6 +290,16 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     }
 
     @Override
+    public int ticksSinceZipcastEnd() {
+        return this.ticksSinceZipcastEnd;
+    }
+
+    @Override
+    public void setTicksSinceZipcastEnd(int ticksSinceZipcastEnd) {
+        this.ticksSinceZipcastEnd = ticksSinceZipcastEnd;
+    }
+
+    @Override
     public boolean allowZipcastDuringZipcast() {
         return this.allowZipcastDuringZipcast;
     }
@@ -291,6 +307,16 @@ public class PlayerEntityMixin extends LivingEntityMixin implements ZipcasterPla
     @Override
     public void setAllowZipcastDuringZipcast(boolean allow) {
         this.allowZipcastDuringZipcast = allow;
+    }
+
+    @Override
+    public boolean sneakShouldCancelZipcast() {
+        return this.sneakShouldCancelZipcast;
+    }
+
+    @Override
+    public void setSneakShouldCancelZipcast(boolean sneakShouldCancelZipcast) {
+        this.sneakShouldCancelZipcast = sneakShouldCancelZipcast;
     }
 
     @Override
